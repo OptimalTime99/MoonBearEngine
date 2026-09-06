@@ -1,69 +1,92 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="01 Engine">
+      <UniqueIdentifier>{36075de4-a1fe-4851-a683-dcaa1ee9fcce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="01 Engine\Engine">
+      <UniqueIdentifier>{bf468af1-8cd7-4f27-91ab-dd7a99fb7b76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="01 Engine\Engine\Public">
+      <UniqueIdentifier>{0a211082-acce-4160-a09d-1bebb70cf940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Public\Core">
+      <UniqueIdentifier>{1891042a-e527-4c31-b323-aed1f8240313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private">
+      <UniqueIdentifier>{b5f8e463-f4fc-4fe7-b479-d19e35d99955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private\Core">
+      <UniqueIdentifier>{b150d1bd-4b10-45fc-9f97-595f9068c1c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private\Platform">
+      <UniqueIdentifier>{09e4cb49-888d-4a58-9446-07f138461c5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private\Platform\Windows">
+      <UniqueIdentifier>{d1b546d0-eba1-4b68-98bd-ec38bc6a8c70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private\Renderer">
+      <UniqueIdentifier>{6588e91e-98d8-4f57-bfb1-9b4ba594f8f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01 Engine\Engine\Private\Renderer\D3D11">
+      <UniqueIdentifier>{25905f30-3550-4c38-8f52-7f51caf624fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03 Shaders">
+      <UniqueIdentifier>{db67fcec-9b81-49a4-a4fc-3265ea75385d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Core\Assert.cpp">
+      <Filter>01 Engine\Engine\Private\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Private\Core\Engine.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Core</Filter>
     </ClCompile>
     <ClCompile Include="Private\Core\Log.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Core\Assert.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Core</Filter>
     </ClCompile>
     <ClCompile Include="Private\Core\Timer.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Core</Filter>
     </ClCompile>
     <ClCompile Include="Private\Platform\Windows\WindowsInput.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Private\Platform\Windows\WindowsWindow.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="Private\Renderer\D3D11\D3D11Renderer.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Renderer\D3D11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Core\Timer.h">
+      <Filter>01 Engine\Engine\Private\Core</Filter>
+    </ClInclude>
     <ClInclude Include="Public\Engine\Core\Application.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Engine\Core\Engine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Engine\Core\Log.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>01 Engine\Engine\Public\Core</Filter>
     </ClInclude>
     <ClInclude Include="Public\Engine\Core\Assert.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>01 Engine\Engine\Public\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Core\Timer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Public\Engine\Core\Engine.h">
+      <Filter>01 Engine\Engine\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Engine\Core\Log.h">
+      <Filter>01 Engine\Engine\Public\Core</Filter>
     </ClInclude>
     <ClInclude Include="Private\Platform\Windows\WindowsInput.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Private\Platform\Windows\WindowsWindow.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="Private\Renderer\D3D11\D3D11Renderer.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>01 Engine\Engine\Private\Renderer\D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\Shaders\Basic.hlsl" />
+    <FxCompile Include="..\..\Shaders\Basic.hlsl">
+      <Filter>03 Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

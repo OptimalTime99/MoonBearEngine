@@ -137,16 +137,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.vcxproj">
+      <Project>{2328369a-ddd0-409c-82b3-b62f2a9939cc}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SandboxApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SandboxApplication.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Engine\Engine.vcxproj">
-      <Project>{2328369a-ddd0-409c-82b3-b62f2a9939cc}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
