@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.06
+ * 파일 수정일 : 26.09.07
  *
  * 파일 개요 : FEngine의 실행 흐름과 Application 생명주기 구현
  * Window, Input, Timer, D3D11 Renderer를 생성하고 게임 루프를 실행
@@ -23,19 +23,23 @@
 
 namespace Engine
 {
-    int FEngine::Run(IApplication& Application)
+    int FEngine::Run(
+        IApplication& Application)
     {
-        FLog::Info("Engine starting.");
+        FLog::Info(
+            "Engine starting.");
 
         FWindowsInput Input;
         FWindowsWindow Window{ Input };
 
         if (!Window.Initialize(
-            L"MoonBearEngine Sandbox",
+            L"MyEngine Sandbox",
             1280,
             720))
         {
-            FLog::Error("Window initialization failed.");
+            FLog::Error(
+                "Window initialization failed.");
+
             return EXIT_FAILURE;
         }
 
@@ -47,18 +51,24 @@ namespace Engine
 
         if (!Renderer.Initialize(Window))
         {
-            FLog::Error("Renderer initialization failed.");
+            FLog::Error(
+                "Renderer initialization failed.");
+
             return EXIT_FAILURE;
         }
 
         if (!Application.OnInitialize())
         {
-            FLog::Error("Application initialization failed.");
+            FLog::Error(
+                "Application initialization failed.");
+
             return EXIT_FAILURE;
         }
 
         FTimer Timer;
         Timer.Reset();
+
+        bool HasRuntimeError = false;
 
         while (!Window.ShouldClose())
         {
@@ -87,25 +97,40 @@ namespace Engine
                     NewWidth,
                     NewHeight))
                 {
-                    FLog::Error("Renderer resize failed.");
+                    FLog::Error(
+                        "Renderer resize failed.");
+
+                    HasRuntimeError = true;
                     break;
                 }
             }
 
             Timer.Tick();
-            Application.OnUpdate(Timer.GetDeltaTime());
 
-            if (!Renderer.Render())
+            const float DeltaTime =
+                Timer.GetDeltaTime();
+
+            Application.OnUpdate(
+                DeltaTime);
+
+            if (!Renderer.Render(
+                DeltaTime))
             {
-                FLog::Error("Rendering failed.");
+                FLog::Error(
+                    "Rendering failed.");
+
+                HasRuntimeError = true;
                 break;
             }
         }
 
         Application.OnShutdown();
 
-        FLog::Info("Engine stopped.");
+        FLog::Info(
+            "Engine stopped.");
 
-        return EXIT_SUCCESS;
+        return HasRuntimeError
+            ? EXIT_FAILURE
+            : EXIT_SUCCESS;
     }
 }
