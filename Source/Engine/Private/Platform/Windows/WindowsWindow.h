@@ -5,7 +5,7 @@
  * 파일 수정일 : 26.09.06
  *
  * 클래스 개요 : Win32 창 생성과 Windows 메시지 처리를 담당하는 클래스
- * 키보드 메시지를 입력 시스템에 전달하고 창 종료 상태를 관리
+ * 키보드 입력, 창 종료, 클라이언트 영역 크기 변경 상태를 관리
  */
 
 #pragma once
@@ -49,6 +49,20 @@ namespace Engine
         [[nodiscard]]
         bool ShouldClose() const noexcept;
 
+        [[nodiscard]]
+        HWND GetNativeHandle() const noexcept;
+
+        [[nodiscard]]
+        std::uint32_t GetClientWidth() const noexcept;
+
+        [[nodiscard]]
+        std::uint32_t GetClientHeight() const noexcept;
+
+        [[nodiscard]]
+        bool ConsumeResizeRequest(
+            std::uint32_t& OutWidth,
+            std::uint32_t& OutHeight) noexcept;
+
     private:
         static LRESULT CALLBACK WindowProcedure(
             HWND WindowHandle,
@@ -71,6 +85,10 @@ namespace Engine
         HWND WindowHandle = nullptr;
         ATOM WindowClassAtom = 0;
 
+        std::uint32_t ClientWidth = 0;
+        std::uint32_t ClientHeight = 0;
+
         bool bShouldClose = false;
+        bool bResizeRequested = false;
     };
 }

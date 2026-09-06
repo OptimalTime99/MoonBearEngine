@@ -141,15 +141,31 @@
     <ClCompile Include="Private\Core\Timer.cpp" />
     <ClCompile Include="Private\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="Private\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="Private\Renderer\D3D11\D3D11Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Core\Timer.h" />
     <ClInclude Include="Private\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="Private\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="Private\Renderer\D3D11\D3D11Renderer.h" />
     <ClInclude Include="Public\Engine\Core\Application.h" />
     <ClInclude Include="Public\Engine\Core\Assert.h" />
     <ClInclude Include="Public\Engine\Core\Engine.h" />
     <ClInclude Include="Public\Engine\Core\Log.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Shaders\Basic.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

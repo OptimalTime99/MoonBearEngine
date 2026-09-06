@@ -5,7 +5,7 @@
  * 파일 수정일 : 26.09.06
  *
  * 파일 개요 : Win32 창 등록, 생성, 메시지 처리와 자원 정리 구현
- * Windows 메시지를 실제 FWindowsWindow 객체에 전달하도록 연결
+ * Windows 메시지를 FWindowsWindow 객체와 연결하고 크기 변경을 기록
  */
 
 #include "Platform/Windows/WindowsWindow.h"
@@ -43,12 +43,12 @@ namespace Engine
 
     bool FWindowsWindow::Initialize(
         const wchar_t* Title,
-        const std::uint32_t ClientWidth,
-        const std::uint32_t ClientHeight)
+        const std::uint32_t InClientWidth,
+        const std::uint32_t InClientHeight)
     {
         ENGINE_ASSERT(Title != nullptr);
-        ENGINE_ASSERT(ClientWidth > 0);
-        ENGINE_ASSERT(ClientHeight > 0);
+        ENGINE_ASSERT(InClientWidth > 0);
+        ENGINE_ASSERT(InClientHeight > 0);
         ENGINE_ASSERT(WindowHandle == nullptr);
 
         InstanceHandle = ::GetModuleHandleW(nullptr);
@@ -82,8 +82,8 @@ namespace Engine
         RECT WindowRectangle{
             0,
             0,
-            static_cast<LONG>(ClientWidth),
-            static_cast<LONG>(ClientHeight)
+            static_cast<LONG>(InClientWidth),
+            static_cast<LONG>(InClientHeight)
         };
 
         if (!::AdjustWindowRect(
@@ -123,6 +123,26 @@ namespace Engine
 
         ::ShowWindow(WindowHandle, SW_SHOW);
         ::UpdateWindow(WindowHandle);
+
+        RECT ClientRectangle{};
+
+        if (!::GetClientRect(WindowHandle, &ClientRectangle))
+        {
+            FLog::Error("Failed to get the client area.");
+            return false;
+        }
+
+        ClientWidth = static_cast<std::uint32_t>(
+            ClientRectangle.right - ClientRectangle.left);
+
+        ClientHeight = static_cast<std::uint32_t>(
+            ClientRectangle.bottom - ClientRectangle.top);
+
+        /*
+         * 창 생성 과정에서 발생한 WM_SIZE는 현재 크기에 이미 반영됐다.
+         * 렌더러는 이 크기로 처음 생성되므로 별도 Resize가 필요하지 않다.
+         */
+        bResizeRequested = false;
 
         FLog::Info("Window initialized.");
 
@@ -164,6 +184,37 @@ namespace Engine
     bool FWindowsWindow::ShouldClose() const noexcept
     {
         return bShouldClose;
+    }
+
+    HWND FWindowsWindow::GetNativeHandle() const noexcept
+    {
+        return WindowHandle;
+    }
+
+    std::uint32_t FWindowsWindow::GetClientWidth() const noexcept
+    {
+        return ClientWidth;
+    }
+
+    std::uint32_t FWindowsWindow::GetClientHeight() const noexcept
+    {
+        return ClientHeight;
+    }
+
+    bool FWindowsWindow::ConsumeResizeRequest(
+        std::uint32_t& OutWidth,
+        std::uint32_t& OutHeight) noexcept
+    {
+        if (!bResizeRequested)
+        {
+            return false;
+        }
+
+        OutWidth = ClientWidth;
+        OutHeight = ClientHeight;
+        bResizeRequested = false;
+
+        return true;
     }
 
     LRESULT CALLBACK FWindowsWindow::WindowProcedure(
@@ -232,8 +283,8 @@ namespace Engine
 
         case WM_NCDESTROY:
             /*
-             * 운영체제가 창을 완전히 제거한 이후에는 HWND를 다시
-             * DestroyWindow에 전달하지 않도록 소유 상태를 비운다.
+             * 운영체제가 창을 완전히 제거한 뒤에는 해당 HWND를
+             * 다시 DestroyWindow에 전달하지 않도록 상태를 비운다.
              */
             ::SetWindowLongPtrW(
                 InWindowHandle,
@@ -247,6 +298,31 @@ namespace Engine
                 Message,
                 WParam,
                 LParam);
+
+        case WM_SIZE:
+        {
+            if (WParam == SIZE_MINIMIZED)
+            {
+                return 0;
+            }
+
+            const std::uint32_t NewWidth =
+                static_cast<std::uint32_t>(LOWORD(LParam));
+
+            const std::uint32_t NewHeight =
+                static_cast<std::uint32_t>(HIWORD(LParam));
+
+            if (NewWidth == 0 || NewHeight == 0)
+            {
+                return 0;
+            }
+
+            ClientWidth = NewWidth;
+            ClientHeight = NewHeight;
+            bResizeRequested = true;
+
+            return 0;
+        }
 
         case WM_KEYDOWN:
             Input.SetKeyState(
@@ -262,8 +338,8 @@ namespace Engine
 
         case WM_KILLFOCUS:
             /*
-             * 키를 누른 상태에서 창의 포커스를 잃으면 KeyUp 메시지를
-             * 받지 못할 수 있으므로 모든 키 상태를 해제한다.
+             * 키를 누른 상태에서 포커스를 잃으면 WM_KEYUP을 받지
+             * 못할 수 있으므로 모든 키 상태를 해제한다.
              */
             Input.Reset();
             return 0;

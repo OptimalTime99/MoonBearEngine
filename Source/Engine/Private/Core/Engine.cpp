@@ -5,7 +5,7 @@
  * 파일 수정일 : 26.09.06
  *
  * 파일 개요 : FEngine의 실행 흐름과 Application 생명주기 구현
- * Window, 입력, Timer를 생성하고 창이 닫힐 때까지 게임 루프를 실행
+ * Window, Input, Timer, D3D11 Renderer를 생성하고 게임 루프를 실행
  */
 
 #include <Engine/Core/Engine.h>
@@ -16,10 +16,10 @@
 #include "Core/Timer.h"
 #include "Platform/Windows/WindowsInput.h"
 #include "Platform/Windows/WindowsWindow.h"
+#include "Renderer/D3D11/D3D11Renderer.h"
 
-#include <chrono>
+#include <cstdint>
 #include <cstdlib>
-#include <thread>
 
 namespace Engine
 {
@@ -39,6 +39,18 @@ namespace Engine
             return EXIT_FAILURE;
         }
 
+        /*
+         * 생성의 역순으로 Renderer가 Window보다 먼저 제거되도록
+         * Window 다음에 Renderer를 생성한다.
+         */
+        FD3D11Renderer Renderer;
+
+        if (!Renderer.Initialize(Window))
+        {
+            FLog::Error("Renderer initialization failed.");
+            return EXIT_FAILURE;
+        }
+
         if (!Application.OnInitialize())
         {
             FLog::Error("Application initialization failed.");
@@ -48,18 +60,8 @@ namespace Engine
         FTimer Timer;
         Timer.Reset();
 
-        /*
-         * 아직 Present 기반 VSync가 없으므로 빈 루프가 CPU를 모두
-         * 사용하지 않도록 임시로 약 60FPS 간격을 적용한다.
-         */
-        constexpr auto TargetFrameDuration =
-            std::chrono::nanoseconds{ 16'666'667 };
-
         while (!Window.ShouldClose())
         {
-            const auto FrameStart =
-                std::chrono::steady_clock::now();
-
             Input.BeginFrame();
             Window.ProcessMessages();
 
@@ -74,11 +76,30 @@ namespace Engine
                 break;
             }
 
+            std::uint32_t NewWidth = 0;
+            std::uint32_t NewHeight = 0;
+
+            if (Window.ConsumeResizeRequest(
+                NewWidth,
+                NewHeight))
+            {
+                if (!Renderer.Resize(
+                    NewWidth,
+                    NewHeight))
+                {
+                    FLog::Error("Renderer resize failed.");
+                    break;
+                }
+            }
+
             Timer.Tick();
             Application.OnUpdate(Timer.GetDeltaTime());
 
-            std::this_thread::sleep_until(
-                FrameStart + TargetFrameDuration);
+            if (!Renderer.Render())
+            {
+                FLog::Error("Rendering failed.");
+                break;
+            }
         }
 
         Application.OnShutdown();
