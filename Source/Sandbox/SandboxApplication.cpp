@@ -5,7 +5,7 @@
  * 파일 수정일 : 26.09.06
  *
  * 파일 개요 : FSandboxApplication의 생명주기 함수 구현
- * 중복 초기화와 잘못된 종료 호출을 검사하고 현재 상태를 로그로 출력
+ * 초기화와 종료 순서를 검사하며 프레임 업데이트 진입점을 제공
  */
 
 #include "SandboxApplication.h"
@@ -22,6 +22,14 @@ bool FSandboxApplication::OnInitialize()
     Engine::FLog::Info("Sandbox initialized.");
 
     return true;
+}
+
+void FSandboxApplication::OnUpdate(float)
+{
+    /*
+     * 현재 단계에는 실행할 게임 로직이 없다.
+     * DeltaTime은 3단계 이후 오브젝트 이동을 구현할 때 사용한다.
+     */
 }
 
 void FSandboxApplication::OnShutdown()

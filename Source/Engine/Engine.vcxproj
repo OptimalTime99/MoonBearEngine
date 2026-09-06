@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +127,7 @@
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,8 +138,14 @@
     <ClCompile Include="Private\Core\Assert.cpp" />
     <ClCompile Include="Private\Core\Engine.cpp" />
     <ClCompile Include="Private\Core\Log.cpp" />
+    <ClCompile Include="Private\Core\Timer.cpp" />
+    <ClCompile Include="Private\Platform\Windows\WindowsInput.cpp" />
+    <ClCompile Include="Private\Platform\Windows\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Core\Timer.h" />
+    <ClInclude Include="Private\Platform\Windows\WindowsInput.h" />
+    <ClInclude Include="Private\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="Public\Engine\Core\Application.h" />
     <ClInclude Include="Public\Engine\Core\Assert.h" />
     <ClInclude Include="Public\Engine\Core\Engine.h" />
