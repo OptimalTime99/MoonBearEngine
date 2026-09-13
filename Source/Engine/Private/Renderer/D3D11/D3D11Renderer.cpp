@@ -19,81 +19,64 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 
+#include "Assets/AssetManager.h"
+
+#include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/RenderTypes.h"
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Texture.h"
+
 #include <array>
+#include <memory>
 #include <cstdint>
 
 namespace
 {
-    struct FVertex
-    {
-        float Position[3];
-        float Color[4];
-    };
+    using Engine::FVertex;
 
-    /*
-     * D3D11 Constant Buffer의 크기는
-     * 반드시 16바이트의 배수여야 한다.
-     */
-    struct alignas(16) FTransformBuffer
-    {
-        DirectX::XMFLOAT4X4 WorldMatrix;
-        DirectX::XMFLOAT4X4 ViewMatrix;
-        DirectX::XMFLOAT4X4 ProjectionMatrix;
-    };
+    constexpr DirectX::XMFLOAT4 White{1.0f, 1.0f, 1.0f, 1.0f};
 
-    static_assert(sizeof(FTransformBuffer) % 16 == 0,
-                  "Constant buffer size must be a multiple of 16 bytes.");
+    constexpr std::array<FVertex, 24> CubeVertices{
+        {
+            // 앞면
+            {{-1, -1, -1}, White, {0, 1}}, {{-1, 1, -1}, White, {0, 0}},
+            {{1, 1, -1}, White, {1, 0}}, {{1, -1, -1}, White, {1, 1}},
 
-    constexpr std::array<FVertex, 8> CubeVertices{
-        FVertex{{-1.0f, -1.0f, -1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        FVertex{{-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        FVertex{{1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-        FVertex{{1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
-        FVertex{{-1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 1.0f, 1.0f}},
-        FVertex{{-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
-        FVertex{{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-        FVertex{{1.0f, -1.0f, 1.0f}, {0.3f, 0.3f, 0.3f, 1.0f}}
+            // 뒷면
+            {{1, -1, 1}, White, {0, 1}}, {{1, 1, 1}, White, {0, 0}},
+            {{-1, 1, 1}, White, {1, 0}}, {{-1, -1, 1}, White, {1, 1}},
+
+            // 왼쪽 면
+            {{-1, -1, 1}, White, {0, 1}}, {{-1, 1, 1}, White, {0, 0}},
+            {{-1, 1, -1}, White, {1, 0}}, {{-1, -1, -1}, White, {1, 1}},
+
+            // 오른쪽 면
+            {{1, -1, -1}, White, {0, 1}}, {{1, 1, -1}, White, {0, 0}},
+            {{1, 1, 1}, White, {1, 0}}, {{1, -1, 1}, White, {1, 1}},
+
+            // 위쪽 면
+            {{-1, 1, -1}, White, {0, 1}}, {{-1, 1, 1}, White, {0, 0}},
+            {{1, 1, 1}, White, {1, 0}}, {{1, 1, -1}, White, {1, 1}},
+
+            // 아래쪽 면
+            {{-1, -1, 1}, White, {0, 1}}, {{-1, -1, -1}, White, {0, 0}},
+            {{1, -1, -1}, White, {1, 0}}, {{1, -1, 1}, White, {1, 1}}
+        }
     };
 
     constexpr std::array<std::uint16_t, 36> CubeIndices{
-        // 앞면
-        0, 1, 2, 0, 2, 3,
-
-        // 뒷면
-        4, 6, 5, 4, 7, 6,
-
-        // 왼쪽 면
-        4, 5, 1, 4, 1, 0,
-
-        // 오른쪽 면
-        3, 2, 6, 3, 6, 7,
-
-        // 위쪽 면
-        1, 5, 6, 1, 6, 2,
-
-        // 아래쪽 면
-        4, 0, 3, 4, 3, 7
+        {
+            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14,
+            12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+        }
     };
-
-    void LogShaderCompileError(ID3DBlob* ErrorBlob)
-    {
-        if (ErrorBlob == nullptr)
-        {
-            return;
-        }
-
-        const auto* ErrorMessage = static_cast<const char*>(ErrorBlob->
-            GetBufferPointer());
-
-        if (ErrorMessage != nullptr)
-        {
-            Engine::FLog::Error(ErrorMessage);
-        }
-    }
 }
 
 namespace Engine
 {
+    FD3D11Renderer::FD3D11Renderer() = default;
+    FD3D11Renderer::~FD3D11Renderer() = default;
+
     bool FD3D11Renderer::Initialize(const FWindowsWindow& Window)
     {
         const std::uint32_t Width = Window.GetClientWidth();
@@ -115,17 +98,19 @@ namespace Engine
             return false;
         }
 
-        if (!CreateShaders())
-        {
-            return false;
-        }
-
-        if (!CreateCubeResources())
-        {
-            return false;
-        }
-
         if (!CreateTransformBuffer())
+        {
+            return false;
+        }
+
+        if (!CreateSamplerState())
+        {
+            return false;
+        }
+
+        AssetManager = std::make_unique<FAssetManager>(*Device.Get());
+
+        if (!LoadAssets())
         {
             return false;
         }
@@ -367,194 +352,80 @@ namespace Engine
         return true;
     }
 
-    bool FD3D11Renderer::CreateShaders()
-    {
-        ENGINE_ASSERT(Device != nullptr);
-
-        UINT ShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-
-#if defined(_DEBUG)
-        ShaderFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-        ShaderFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
-
-        Microsoft::WRL::ComPtr<ID3DBlob> VertexShaderBlob;
-
-        Microsoft::WRL::ComPtr<ID3DBlob> VertexShaderErrorBlob;
-
-        HRESULT Result = D3DCompileFromFile(L"Shaders/Basic.hlsl", nullptr,
-                                            D3D_COMPILE_STANDARD_FILE_INCLUDE,
-                                            "VSMain", "vs_5_0", ShaderFlags, 0,
-                                            VertexShaderBlob.GetAddressOf(),
-                                            VertexShaderErrorBlob.
-                                            GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            LogShaderCompileError(VertexShaderErrorBlob.Get());
-
-            FLog::Error("Failed to compile the vertex shader.");
-
-            return false;
-        }
-
-        Result = Device->CreateVertexShader(
-            VertexShaderBlob->GetBufferPointer(),
-            VertexShaderBlob->GetBufferSize(), nullptr,
-            VertexShader.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to create the vertex shader.");
-
-            return false;
-        }
-
-        constexpr D3D11_INPUT_ELEMENT_DESC InputElements[]{
-            {
-                "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-                D3D11_INPUT_PER_VERTEX_DATA, 0
-            },
-            {
-                "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
-                D3D11_INPUT_PER_VERTEX_DATA, 0
-            }
-        };
-
-        Result = Device->CreateInputLayout(InputElements,
-                                           static_cast<UINT>(
-                                               std::size(InputElements)),
-                                           VertexShaderBlob->GetBufferPointer(),
-                                           VertexShaderBlob->GetBufferSize(),
-                                           InputLayout.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to create the input layout.");
-
-            return false;
-        }
-
-        Microsoft::WRL::ComPtr<ID3DBlob> PixelShaderBlob;
-
-        Microsoft::WRL::ComPtr<ID3DBlob> PixelShaderErrorBlob;
-
-        Result = D3DCompileFromFile(L"Shaders/Basic.hlsl", nullptr,
-                                    D3D_COMPILE_STANDARD_FILE_INCLUDE, "PSMain",
-                                    "ps_5_0", ShaderFlags, 0,
-                                    PixelShaderBlob.GetAddressOf(),
-                                    PixelShaderErrorBlob.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            LogShaderCompileError(PixelShaderErrorBlob.Get());
-
-            FLog::Error("Failed to compile the pixel shader.");
-
-            return false;
-        }
-
-        Result = Device->CreatePixelShader(PixelShaderBlob->GetBufferPointer(),
-                                           PixelShaderBlob->GetBufferSize(),
-                                           nullptr, PixelShader.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to create the pixel shader.");
-
-            return false;
-        }
-
-        return true;
-    }
-
-    bool FD3D11Renderer::CreateCubeResources()
-    {
-        ENGINE_ASSERT(Device != nullptr);
-
-        D3D11_BUFFER_DESC VertexBufferDescription{};
-
-        VertexBufferDescription.ByteWidth = static_cast<UINT>(CubeVertices.
-            size() * sizeof(FVertex));
-
-        VertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-
-        VertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-        VertexBufferDescription.CPUAccessFlags = 0;
-        VertexBufferDescription.MiscFlags = 0;
-        VertexBufferDescription.StructureByteStride = 0;
-
-        D3D11_SUBRESOURCE_DATA VertexData{};
-        VertexData.pSysMem = CubeVertices.data();
-
-        HRESULT Result = Device->CreateBuffer(&VertexBufferDescription,
-                                              &VertexData,
-                                              VertexBuffer.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to create the cube vertex buffer.");
-
-            return false;
-        }
-
-        D3D11_BUFFER_DESC IndexBufferDescription{};
-
-        IndexBufferDescription.ByteWidth = static_cast<UINT>(CubeIndices.size()
-            * sizeof(std::uint16_t));
-
-        IndexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-
-        IndexBufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-        IndexBufferDescription.CPUAccessFlags = 0;
-        IndexBufferDescription.MiscFlags = 0;
-        IndexBufferDescription.StructureByteStride = 0;
-
-        D3D11_SUBRESOURCE_DATA IndexData{};
-        IndexData.pSysMem = CubeIndices.data();
-
-        Result = Device->CreateBuffer(&IndexBufferDescription, &IndexData,
-                                      IndexBuffer.GetAddressOf());
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to create the cube index buffer.");
-
-            return false;
-        }
-
-        IndexCount = static_cast<std::uint32_t>(CubeIndices.size());
-
-        return true;
-    }
-
     bool FD3D11Renderer::CreateTransformBuffer()
     {
-        ENGINE_ASSERT(Device != nullptr);
-
-        D3D11_BUFFER_DESC BufferDescription{};
-
-        BufferDescription.ByteWidth = static_cast<UINT>(sizeof(
-            FTransformBuffer));
-
-        BufferDescription.Usage = D3D11_USAGE_DYNAMIC;
-
-        BufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-        BufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-        BufferDescription.MiscFlags = 0;
-        BufferDescription.StructureByteStride = 0;
+        D3D11_BUFFER_DESC Description{};
+        Description.ByteWidth = sizeof(FTransformBuffer);
+        Description.Usage = D3D11_USAGE_DYNAMIC;
+        Description.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        Description.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
         const HRESULT Result = Device->CreateBuffer(
-            &BufferDescription, nullptr, TransformBuffer.GetAddressOf());
+            &Description, nullptr, TransformBuffer.GetAddressOf());
 
         if (FAILED(Result))
         {
-            FLog::Error("Failed to create the transform constant buffer.");
+            FLog::Error("Failed to create the transform buffer.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    bool FD3D11Renderer::CreateSamplerState()
+    {
+        D3D11_SAMPLER_DESC Description{};
+        Description.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        Description.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        Description.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        Description.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        Description.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        Description.MinLOD = 0.0f;
+        Description.MaxLOD = D3D11_FLOAT32_MAX;
+
+        const HRESULT Result = Device->CreateSamplerState(
+            &Description, SamplerState.GetAddressOf());
+
+        if (FAILED(Result))
+        {
+            FLog::Error("Failed to create the sampler state.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    bool FD3D11Renderer::LoadAssets()
+    {
+        ENGINE_ASSERT(AssetManager != nullptr);
+
+        CubeMesh = AssetManager->CreateMesh("Cube", CubeVertices, CubeIndices);
+
+        if (CubeMesh == nullptr)
+        {
+            FLog::Error("Failed to create the cube mesh.");
+
+            return false;
+        }
+
+        BasicShader = AssetManager->LoadShader("BasicShader",
+                                               L"Shaders/Basic.hlsl");
+
+        if (BasicShader == nullptr)
+        {
+            FLog::Error("Failed to load the basic shader.");
+
+            return false;
+        }
+
+        CheckerTexture = AssetManager->LoadTexture(
+            "CheckerTexture", L"Assets/Textures/Checker.png");
+
+        if (CheckerTexture == nullptr)
+        {
+            FLog::Error("Failed to load the checker texture.");
 
             return false;
         }
@@ -621,18 +492,12 @@ namespace Engine
         ENGINE_ASSERT(DeviceContext != nullptr);
         ENGINE_ASSERT(RenderTargetView != nullptr);
         ENGINE_ASSERT(DepthStencilView != nullptr);
-        ENGINE_ASSERT(VertexBuffer != nullptr);
-        ENGINE_ASSERT(IndexBuffer != nullptr);
         ENGINE_ASSERT(TransformBuffer != nullptr);
-        ENGINE_ASSERT(VertexShader != nullptr);
-        ENGINE_ASSERT(PixelShader != nullptr);
-        ENGINE_ASSERT(InputLayout != nullptr);
+        ENGINE_ASSERT(SamplerState != nullptr);
+        ENGINE_ASSERT(CubeMesh != nullptr);
+        ENGINE_ASSERT(BasicShader != nullptr);
+        ENGINE_ASSERT(CheckerTexture != nullptr);
 
-        /*
-         * 초당 45도씩 회전한다.
-         * DeltaTime을 사용하므로 프레임 속도와 무관하게
-         * 동일한 속도로 회전한다.
-         */
         RotationRadians += DeltaTime * DirectX::XMConvertToRadians(45.0f);
 
         if (RotationRadians >= DirectX::XM_2PI)
@@ -648,10 +513,6 @@ namespace Engine
 
         const DirectX::XMMATRIX ProjectionMatrix = Camera.GetProjectionMatrix();
 
-        /*
-         * 매 프레임 변경되는 Transform 데이터를
-         * Constant Buffer에 기록한다.
-         */
         D3D11_MAPPED_SUBRESOURCE MappedResource{};
 
         HRESULT Result = DeviceContext->Map(TransformBuffer.Get(), 0,
@@ -660,7 +521,7 @@ namespace Engine
 
         if (FAILED(Result))
         {
-            FLog::Error("Failed to map the transform constant buffer.");
+            FLog::Error("Failed to map the transform buffer.");
 
             return false;
         }
@@ -668,10 +529,6 @@ namespace Engine
         auto* TransformData = static_cast<FTransformBuffer*>(MappedResource.
             pData);
 
-        /*
-         * DirectXMath와 HLSL의 행렬 저장 규칙을 맞추기 위해
-         * GPU로 전달하기 전에 각 행렬을 전치한다.
-         */
         DirectX::XMStoreFloat4x4(&TransformData->WorldMatrix,
                                  DirectX::XMMatrixTranspose(WorldMatrix));
 
@@ -688,43 +545,26 @@ namespace Engine
         DeviceContext->OMSetRenderTargets(1, RenderTargets,
                                           DepthStencilView.Get());
 
-        DeviceContext->
-            ClearRenderTargetView(RenderTargetView.Get(), ClearColor);
+        DeviceContext->ClearRenderTargetView(
+            RenderTargetView.Get(), ClearColor);
 
         DeviceContext->ClearDepthStencilView(DepthStencilView.Get(),
                                              D3D11_CLEAR_DEPTH |
                                              D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        const UINT Stride = sizeof(FVertex);
+        BasicShader->Bind(*DeviceContext.Get());
 
-        const UINT Offset = 0;
+        ID3D11Buffer* TransformBuffers[]{TransformBuffer.Get()};
 
-        ID3D11Buffer* VertexBuffers[]{VertexBuffer.Get()};
+        DeviceContext->VSSetConstantBuffers(0, 1, TransformBuffers);
 
-        DeviceContext->
-            IASetVertexBuffers(0, 1, VertexBuffers, &Stride, &Offset);
+        CheckerTexture->Bind(*DeviceContext.Get(), 0);
 
-        DeviceContext->IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R16_UINT,
-                                        0);
+        ID3D11SamplerState* Samplers[]{SamplerState.Get()};
 
-        DeviceContext->IASetInputLayout(InputLayout.Get());
+        DeviceContext->PSSetSamplers(0, 1, Samplers);
 
-        DeviceContext->IASetPrimitiveTopology(
-            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        DeviceContext->VSSetShader(VertexShader.Get(), nullptr, 0);
-
-        ID3D11Buffer* ConstantBuffers[]{TransformBuffer.Get()};
-
-        /*
-         * HLSL의 register(b0)에
-         * Transform Constant Buffer를 연결한다.
-         */
-        DeviceContext->VSSetConstantBuffers(0, 1, ConstantBuffers);
-
-        DeviceContext->PSSetShader(PixelShader.Get(), nullptr, 0);
-
-        DeviceContext->DrawIndexed(IndexCount, 0, 0);
+        CubeMesh->Draw(*DeviceContext.Get());
 
         Result = SwapChain->Present(1, 0);
 

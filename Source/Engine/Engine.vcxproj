@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Core\Assert.cpp" />
     <ClCompile Include="Private\Core\Engine.cpp" />
     <ClCompile Include="Private\Core\Log.cpp" />
@@ -143,13 +144,21 @@
     <ClCompile Include="Private\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="Private\Renderer\Camera.cpp" />
     <ClCompile Include="Private\Renderer\D3D11\D3D11Renderer.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Mesh.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Shader.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Assets\AssetManager.h" />
     <ClInclude Include="Private\Core\Timer.h" />
     <ClInclude Include="Private\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="Private\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="Private\Renderer\Camera.h" />
     <ClInclude Include="Private\Renderer\D3D11\D3D11Renderer.h" />
+    <ClInclude Include="Private\Renderer\Resources\Mesh.h" />
+    <ClInclude Include="Private\Renderer\Resources\RenderTypes.h" />
+    <ClInclude Include="Private\Renderer\Resources\Shader.h" />
+    <ClInclude Include="Private\Renderer\Resources\Texture.h" />
     <ClInclude Include="Public\Engine\Core\Application.h" />
     <ClInclude Include="Public\Engine\Core\Assert.h" />
     <ClInclude Include="Public\Engine\Core\Engine.h" />

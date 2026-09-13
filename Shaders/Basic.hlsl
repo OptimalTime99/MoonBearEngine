@@ -2,10 +2,10 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.07
+ * 파일 수정일 : 26.09.13
  *
- * 파일 개요 : 3D 오브젝트를 출력하기 위한 정점 및 픽셀 셰이더
- * World, View, Projection 행렬로 정점 위치를 변환하고 정점 색상을 보간하여 출력
+ * 파일 개요 : 텍스처가 적용된 3D 오브젝트를 출력하기 위한 셰이더
+ * World, View, Projection 행렬로 위치를 변환하고 텍스처와 정점 색상을 출력
  */
 
 /*
@@ -19,16 +19,21 @@ cbuffer FTransformBuffer : register(b0)
     float4x4 ProjectionMatrix;
 };
 
+Texture2D DiffuseTexture : register(t0);
+SamplerState LinearSampler : register(s0);
+
 struct FVertexInput
 {
     float3 Position : POSITION;
     float4 Color : COLOR;
+    float2 TextureCoordinate : TEXCOORD;
 };
 
 struct FVertexOutput
 {
     float4 Position : SV_POSITION;
     float4 Color : COLOR;
+    float2 TextureCoordinate : TEXCOORD;
 };
 
 FVertexOutput VSMain(FVertexInput Input)
@@ -47,6 +52,7 @@ FVertexOutput VSMain(FVertexInput Input)
 
     Output.Position = Position;
     Output.Color = Input.Color;
+    Output.TextureCoordinate = Input.TextureCoordinate;
 
     return Output;
 }
@@ -57,5 +63,8 @@ float4 PSMain(FVertexOutput Input) : SV_TARGET
      * 래스터라이저가 보간한 정점 색상을
      * 최종 픽셀 색상으로 출력한다.
      */
-    return Input.Color;
+    const float4 TextureColor = DiffuseTexture.Sample(
+        LinearSampler, Input.TextureCoordinate);
+
+    return TextureColor * Input.Color;
 }
