@@ -23,22 +23,16 @@
 
 namespace Engine
 {
-    int FEngine::Run(
-        IApplication& Application)
+    int FEngine::Run(IApplication& Application)
     {
-        FLog::Info(
-            "Engine starting.");
+        FLog::Info("Engine starting.");
 
         FWindowsInput Input;
-        FWindowsWindow Window{ Input };
+        FWindowsWindow Window{Input};
 
-        if (!Window.Initialize(
-            L"MyEngine Sandbox",
-            1280,
-            720))
+        if (!Window.Initialize(L"MyEngine Sandbox", 1280, 720))
         {
-            FLog::Error(
-                "Window initialization failed.");
+            FLog::Error("Window initialization failed.");
 
             return EXIT_FAILURE;
         }
@@ -51,16 +45,14 @@ namespace Engine
 
         if (!Renderer.Initialize(Window))
         {
-            FLog::Error(
-                "Renderer initialization failed.");
+            FLog::Error("Renderer initialization failed.");
 
             return EXIT_FAILURE;
         }
 
         if (!Application.OnInitialize())
         {
-            FLog::Error(
-                "Application initialization failed.");
+            FLog::Error("Application initialization failed.");
 
             return EXIT_FAILURE;
         }
@@ -89,16 +81,11 @@ namespace Engine
             std::uint32_t NewWidth = 0;
             std::uint32_t NewHeight = 0;
 
-            if (Window.ConsumeResizeRequest(
-                NewWidth,
-                NewHeight))
+            if (Window.ConsumeResizeRequest(NewWidth, NewHeight))
             {
-                if (!Renderer.Resize(
-                    NewWidth,
-                    NewHeight))
+                if (!Renderer.Resize(NewWidth, NewHeight))
                 {
-                    FLog::Error(
-                        "Renderer resize failed.");
+                    FLog::Error("Renderer resize failed.");
 
                     HasRuntimeError = true;
                     break;
@@ -107,17 +94,13 @@ namespace Engine
 
             Timer.Tick();
 
-            const float DeltaTime =
-                Timer.GetDeltaTime();
+            const float DeltaTime = Timer.GetDeltaTime();
 
-            Application.OnUpdate(
-                DeltaTime);
+            Application.OnUpdate(DeltaTime);
 
-            if (!Renderer.Render(
-                DeltaTime))
+            if (!Renderer.Render(DeltaTime))
             {
-                FLog::Error(
-                    "Rendering failed.");
+                FLog::Error("Rendering failed.");
 
                 HasRuntimeError = true;
                 break;
@@ -126,11 +109,10 @@ namespace Engine
 
         Application.OnShutdown();
 
-        FLog::Info(
-            "Engine stopped.");
+        FLog::Info("Engine stopped.");
 
         return HasRuntimeError
-            ? EXIT_FAILURE
-            : EXIT_SUCCESS;
+                   ? EXIT_FAILURE
+                   : EXIT_SUCCESS;
     }
 }

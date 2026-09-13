@@ -29,38 +29,26 @@ namespace Engine
         FD3D11Renderer() = default;
         ~FD3D11Renderer() = default;
 
-        FD3D11Renderer(
-            const FD3D11Renderer&) = delete;
+        FD3D11Renderer(const FD3D11Renderer&) = delete;
 
-        FD3D11Renderer& operator=(
-            const FD3D11Renderer&) = delete;
+        FD3D11Renderer& operator=(const FD3D11Renderer&) = delete;
 
-        FD3D11Renderer(
-            FD3D11Renderer&&) = delete;
+        FD3D11Renderer(FD3D11Renderer&&) = delete;
 
-        FD3D11Renderer& operator=(
-            FD3D11Renderer&&) = delete;
+        FD3D11Renderer& operator=(FD3D11Renderer&&) = delete;
 
-        bool Initialize(
-            const FWindowsWindow& Window);
+        bool Initialize(const FWindowsWindow& Window);
 
-        bool Resize(
-            std::uint32_t Width,
-            std::uint32_t Height);
+        bool Resize(std::uint32_t Width, std::uint32_t Height);
 
         bool Render(float DeltaTime);
 
     private:
-        bool CreateDeviceAndSwapChain(
-            const FWindowsWindow& Window);
+        bool CreateDeviceAndSwapChain(const FWindowsWindow& Window);
 
-        bool CreateRenderTarget(
-            std::uint32_t Width,
-            std::uint32_t Height);
+        bool CreateRenderTarget(std::uint32_t Width, std::uint32_t Height);
 
-        bool CreateDepthStencil(
-            std::uint32_t Width,
-            std::uint32_t Height);
+        bool CreateDepthStencil(std::uint32_t Width, std::uint32_t Height);
 
         bool CreateShaders();
 
@@ -69,41 +57,29 @@ namespace Engine
         bool CreateTransformBuffer();
 
     private:
-        Microsoft::WRL::ComPtr<ID3D11Device>
-            Device;
+        Microsoft::WRL::ComPtr<ID3D11Device> Device;
 
-        Microsoft::WRL::ComPtr<ID3D11DeviceContext>
-            DeviceContext;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> DeviceContext;
 
-        Microsoft::WRL::ComPtr<IDXGISwapChain1>
-            SwapChain;
+        Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
 
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView>
-            RenderTargetView;
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 
-        Microsoft::WRL::ComPtr<ID3D11Texture2D>
-            DepthStencilTexture;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> DepthStencilTexture;
 
-        Microsoft::WRL::ComPtr<ID3D11DepthStencilView>
-            DepthStencilView;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilView;
 
-        Microsoft::WRL::ComPtr<ID3D11VertexShader>
-            VertexShader;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> VertexShader;
 
-        Microsoft::WRL::ComPtr<ID3D11PixelShader>
-            PixelShader;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> PixelShader;
 
-        Microsoft::WRL::ComPtr<ID3D11InputLayout>
-            InputLayout;
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> InputLayout;
 
-        Microsoft::WRL::ComPtr<ID3D11Buffer>
-            VertexBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
 
-        Microsoft::WRL::ComPtr<ID3D11Buffer>
-            IndexBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> IndexBuffer;
 
-        Microsoft::WRL::ComPtr<ID3D11Buffer>
-            TransformBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> TransformBuffer;
 
         FCamera Camera;
 
@@ -111,11 +87,6 @@ namespace Engine
 
         float RotationRadians = 0.0f;
 
-        float ClearColor[4]{
-            0.02f,
-            0.03f,
-            0.08f,
-            1.0f
-        };
+        float ClearColor[4]{0.02f, 0.03f, 0.08f, 1.0f};
     };
 }

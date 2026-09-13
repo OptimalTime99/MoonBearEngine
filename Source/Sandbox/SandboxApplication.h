@@ -15,8 +15,7 @@
 class FSandboxApplication final : public Engine::IApplication
 {
 public:
-    [[nodiscard]]
-    bool OnInitialize() override;
+    [[nodiscard]] bool OnInitialize() override;
 
     void OnUpdate(float DeltaTime) override;
     void OnShutdown() override;

@@ -21,15 +21,11 @@ namespace Engine
     public:
         FCamera();
 
-        void SetViewportSize(
-            std::uint32_t Width,
-            std::uint32_t Height);
+        void SetViewportSize(std::uint32_t Width, std::uint32_t Height);
 
-        [[nodiscard]]
-        DirectX::XMMATRIX GetViewMatrix() const noexcept;
+        [[nodiscard]] DirectX::XMMATRIX GetViewMatrix() const noexcept;
 
-        [[nodiscard]]
-        DirectX::XMMATRIX GetProjectionMatrix() const noexcept;
+        [[nodiscard]] DirectX::XMMATRIX GetProjectionMatrix() const noexcept;
 
     private:
         DirectX::XMFLOAT3 Position;

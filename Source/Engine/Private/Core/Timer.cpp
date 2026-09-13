@@ -25,8 +25,8 @@ namespace Engine
     {
         const FClock::time_point CurrentTime = FClock::now();
 
-        const std::chrono::duration<float> ElapsedTime =
-            CurrentTime - PreviousTime;
+        const std::chrono::duration<float> ElapsedTime = CurrentTime -
+            PreviousTime;
 
         PreviousTime = CurrentTime;
 
@@ -34,10 +34,7 @@ namespace Engine
          * 디버거 중단이나 창 이동으로 프레임이 오래 정지한 경우에도
          * 한 프레임에 지나치게 큰 시간이 전달되지 않도록 제한한다.
          */
-        DeltaTime = std::clamp(
-            ElapsedTime.count(),
-            0.0f,
-            0.1f);
+        DeltaTime = std::clamp(ElapsedTime.count(), 0.0f, 0.1f);
     }
 
     float FTimer::GetDeltaTime() const noexcept

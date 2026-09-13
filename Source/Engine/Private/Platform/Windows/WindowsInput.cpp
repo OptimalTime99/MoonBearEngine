@@ -24,9 +24,8 @@ namespace Engine
         PreviousKeys = CurrentKeys;
     }
 
-    void FWindowsInput::SetKeyState(
-        const std::uint32_t KeyCode,
-        const bool bIsDown) noexcept
+    void FWindowsInput::SetKeyState(const std::uint32_t KeyCode,
+                                    const bool bIsDown) noexcept
     {
         if (KeyCode >= CurrentKeys.size())
         {
@@ -44,7 +43,6 @@ namespace Engine
 
     bool FWindowsInput::IsEscapePressed() const noexcept
     {
-        return CurrentKeys[EscapeKeyCode]
-            && !PreviousKeys[EscapeKeyCode];
+        return CurrentKeys[EscapeKeyCode] && !PreviousKeys[EscapeKeyCode];
     }
 }

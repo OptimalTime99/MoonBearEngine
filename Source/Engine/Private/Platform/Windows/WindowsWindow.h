@@ -37,44 +37,31 @@ namespace Engine
         FWindowsWindow(FWindowsWindow&&) = delete;
         FWindowsWindow& operator=(FWindowsWindow&&) = delete;
 
-        [[nodiscard]]
-        bool Initialize(
-            const wchar_t* Title,
-            std::uint32_t ClientWidth,
-            std::uint32_t ClientHeight);
+        [[nodiscard]] bool Initialize(const wchar_t* Title,
+                                      std::uint32_t ClientWidth,
+                                      std::uint32_t ClientHeight);
 
         void ProcessMessages();
         void RequestClose();
 
-        [[nodiscard]]
-        bool ShouldClose() const noexcept;
+        [[nodiscard]] bool ShouldClose() const noexcept;
 
-        [[nodiscard]]
-        HWND GetNativeHandle() const noexcept;
+        [[nodiscard]] HWND GetNativeHandle() const noexcept;
 
-        [[nodiscard]]
-        std::uint32_t GetClientWidth() const noexcept;
+        [[nodiscard]] std::uint32_t GetClientWidth() const noexcept;
 
-        [[nodiscard]]
-        std::uint32_t GetClientHeight() const noexcept;
+        [[nodiscard]] std::uint32_t GetClientHeight() const noexcept;
 
-        [[nodiscard]]
-        bool ConsumeResizeRequest(
-            std::uint32_t& OutWidth,
-            std::uint32_t& OutHeight) noexcept;
+        [[nodiscard]] bool ConsumeResizeRequest(std::uint32_t& OutWidth,
+                                                std::uint32_t& OutHeight)
+            noexcept;
 
     private:
-        static LRESULT CALLBACK WindowProcedure(
-            HWND WindowHandle,
-            UINT Message,
-            WPARAM WParam,
-            LPARAM LParam);
+        static LRESULT CALLBACK WindowProcedure(HWND WindowHandle, UINT Message,
+                                                WPARAM WParam, LPARAM LParam);
 
-        LRESULT HandleMessage(
-            HWND WindowHandle,
-            UINT Message,
-            WPARAM WParam,
-            LPARAM LParam);
+        LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam,
+                              LPARAM LParam);
 
         static constexpr const wchar_t* WindowClassName =
             L"MyEngineWindowClass";

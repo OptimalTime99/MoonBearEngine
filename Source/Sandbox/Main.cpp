@@ -22,11 +22,7 @@
 
 #include "SandboxApplication.h"
 
-int WINAPI wWinMain(
-    HINSTANCE,
-    HINSTANCE,
-    PWSTR,
-    int)
+int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     /*
      * 두 객체는 Run이 끝날 때까지만 필요하므로 스택에 생성한다.

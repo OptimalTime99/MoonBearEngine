@@ -34,9 +34,8 @@ namespace Engine
         Write("[Engine][Error] ", Message);
     }
 
-    void FLog::Write(
-        const std::string_view Prefix,
-        const std::string_view Message)
+    void FLog::Write(const std::string_view Prefix,
+                     const std::string_view Message)
     {
         std::string Output;
         Output.reserve(Prefix.size() + Message.size() + 1);

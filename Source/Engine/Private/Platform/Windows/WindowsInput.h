@@ -22,8 +22,7 @@ namespace Engine
         void SetKeyState(std::uint32_t KeyCode, bool bIsDown) noexcept;
         void Reset() noexcept;
 
-        [[nodiscard]]
-        bool IsEscapePressed() const noexcept;
+        [[nodiscard]] bool IsEscapePressed() const noexcept;
 
     private:
         static constexpr std::size_t KeyCount = 256;

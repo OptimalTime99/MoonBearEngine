@@ -17,8 +17,7 @@ namespace Engine
     public:
         virtual ~IApplication() = default;
 
-        [[nodiscard]]
-        virtual bool OnInitialize() = 0;
+        [[nodiscard]] virtual bool OnInitialize() = 0;
 
         virtual void OnUpdate(float DeltaTime) = 0;
         virtual void OnShutdown() = 0;

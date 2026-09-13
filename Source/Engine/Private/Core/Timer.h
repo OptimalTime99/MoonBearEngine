@@ -20,8 +20,7 @@ namespace Engine
         void Reset();
         void Tick();
 
-        [[nodiscard]]
-        float GetDeltaTime() const noexcept;
+        [[nodiscard]] float GetDeltaTime() const noexcept;
 
     private:
         using FClock = std::chrono::steady_clock;
