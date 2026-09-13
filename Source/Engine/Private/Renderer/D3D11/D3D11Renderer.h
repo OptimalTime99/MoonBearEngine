@@ -26,6 +26,7 @@ namespace Engine
     class FShader;
     class FTexture;
     class FWindowsWindow;
+    class FScene;
 
     class FD3D11Renderer final
     {
@@ -41,7 +42,7 @@ namespace Engine
 
         bool Resize(std::uint32_t Width, std::uint32_t Height);
 
-        bool Render(float DeltaTime);
+        bool Render(const FScene& Scene);
 
     private:
         bool CreateDeviceAndSwapChain(const FWindowsWindow& Window);
@@ -53,6 +54,10 @@ namespace Engine
         bool CreateTransformBuffer();
         bool CreateSamplerState();
         bool LoadAssets();
+
+        bool UpdateTransformBuffer(DirectX::FXMMATRIX WorldMatrix,
+                                   DirectX::CXMMATRIX ViewMatrix,
+                                   DirectX::CXMMATRIX ProjectionMatrix);
 
     private:
         Microsoft::WRL::ComPtr<ID3D11Device> Device;
@@ -82,8 +87,6 @@ namespace Engine
         FTexture* CheckerTexture = nullptr;
 
         FCamera Camera;
-
-        float RotationRadians = 0.0f;
 
         float ClearColor[4]{0.02f, 0.03f, 0.08f, 1.0f};
     };

@@ -28,7 +28,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
      * 두 객체는 Run이 끝날 때까지만 필요하므로 스택에 생성한다.
      * 별도의 동적 할당이나 공유 소유권은 필요하지 않다.
      */
-    FSandboxApplication Application;
+    Sandbox::FSandboxApplication Application;
     Engine::FEngine EngineInstance;
 
     return EngineInstance.Run(Application);

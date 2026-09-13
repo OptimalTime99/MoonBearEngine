@@ -2,41 +2,67 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.06
+ * 파일 수정일 : 26.09.13
  *
- * 파일 개요 : FSandboxApplication의 생명주기 함수 구현
- * 초기화와 종료 순서를 검사하며 프레임 업데이트 진입점을 제공
+ * 파일 개요 : 테스트 Scene과 GameObject 구성
  */
 
 #include "SandboxApplication.h"
 
-#include <Engine/Core/Assert.h>
+#include "RotatingComponent.h"
+
 #include <Engine/Core/Log.h>
+#include <Engine/Scene/GameObject.h>
+#include <Engine/Scene/MeshRendererComponent.h>
+#include <Engine/Scene/Scene.h>
 
-bool FSandboxApplication::OnInitialize()
+namespace Sandbox
 {
-    ENGINE_ASSERT(!bIsInitialized);
+    bool FSandboxApplication::OnInitialize(Engine::FScene& Scene)
+    {
+        Engine::FLog::Info("Sandbox initialized.");
 
-    bIsInitialized = true;
+        CubeObject = &Scene.CreateGameObject("RotatingCube");
 
-    Engine::FLog::Info("Sandbox initialized.");
+        CubeObject->GetTransform().SetPosition(0.0f, 0.0f, 0.0f);
 
-    return true;
-}
+        CubeObject->GetTransform().SetScale(1.0f, 1.0f, 1.0f);
 
-void FSandboxApplication::OnUpdate(float)
-{
-    /*
-     * 현재 단계에는 실행할 게임 로직이 없다.
-     * DeltaTime은 3단계 이후 오브젝트 이동을 구현할 때 사용한다.
-     */
-}
+        const auto* MeshRenderer = CubeObject->AddComponent<
+            Engine::FMeshRendererComponent>("Cube", "BasicShader",
+                                            "CheckerTexture");
 
-void FSandboxApplication::OnShutdown()
-{
-    ENGINE_ASSERT(bIsInitialized);
+        if (MeshRenderer == nullptr)
+        {
+            Engine::FLog::Error("Failed to add the mesh renderer component.");
 
-    Engine::FLog::Info("Sandbox shutting down.");
+            return false;
+        }
 
-    bIsInitialized = false;
+        const auto* RotatingComponent = CubeObject->AddComponent<
+            FRotatingComponent>(20.0f, 45.0f, 0.0f);
+
+        if (RotatingComponent == nullptr)
+        {
+            Engine::FLog::Error("Failed to add the rotating component.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    void FSandboxApplication::OnUpdate(float, Engine::FScene&)
+    {
+        /*
+         * 회전은 FRotatingComponent가 처리한다.
+         */
+    }
+
+    void FSandboxApplication::OnShutdown(Engine::FScene&)
+    {
+        CubeObject = nullptr;
+
+        Engine::FLog::Info("Sandbox shutting down.");
+    }
 }

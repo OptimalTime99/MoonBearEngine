@@ -30,6 +30,10 @@
 #include <memory>
 #include <cstdint>
 
+#include "Engine/Scene/GameObject.h"
+#include "Engine/Scene/MeshRendererComponent.h"
+#include "Engine/Scene/Scene.h"
+
 namespace
 {
     using Engine::FVertex;
@@ -433,6 +437,41 @@ namespace Engine
         return true;
     }
 
+    bool FD3D11Renderer::UpdateTransformBuffer(
+        const DirectX::FXMMATRIX WorldMatrix,
+        const DirectX::CXMMATRIX ViewMatrix,
+        const DirectX::CXMMATRIX ProjectionMatrix)
+    {
+        D3D11_MAPPED_SUBRESOURCE MappedResource{};
+
+        const HRESULT Result = DeviceContext->Map(
+            TransformBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
+            &MappedResource);
+
+        if (FAILED(Result))
+        {
+            FLog::Error("Failed to map the transform buffer.");
+
+            return false;
+        }
+
+        auto* TransformData = static_cast<FTransformBuffer*>(MappedResource.
+            pData);
+
+        DirectX::XMStoreFloat4x4(&TransformData->WorldMatrix,
+                                 DirectX::XMMatrixTranspose(WorldMatrix));
+
+        DirectX::XMStoreFloat4x4(&TransformData->ViewMatrix,
+                                 DirectX::XMMatrixTranspose(ViewMatrix));
+
+        DirectX::XMStoreFloat4x4(&TransformData->ProjectionMatrix,
+                                 DirectX::XMMatrixTranspose(ProjectionMatrix));
+
+        DeviceContext->Unmap(TransformBuffer.Get(), 0);
+
+        return true;
+    }
+
     bool FD3D11Renderer::Resize(const std::uint32_t Width,
                                 const std::uint32_t Height)
     {
@@ -487,58 +526,14 @@ namespace Engine
         return true;
     }
 
-    bool FD3D11Renderer::Render(const float DeltaTime)
+    bool FD3D11Renderer::Render(const FScene& Scene)
     {
         ENGINE_ASSERT(DeviceContext != nullptr);
         ENGINE_ASSERT(RenderTargetView != nullptr);
         ENGINE_ASSERT(DepthStencilView != nullptr);
         ENGINE_ASSERT(TransformBuffer != nullptr);
         ENGINE_ASSERT(SamplerState != nullptr);
-        ENGINE_ASSERT(CubeMesh != nullptr);
-        ENGINE_ASSERT(BasicShader != nullptr);
-        ENGINE_ASSERT(CheckerTexture != nullptr);
-
-        RotationRadians += DeltaTime * DirectX::XMConvertToRadians(45.0f);
-
-        if (RotationRadians >= DirectX::XM_2PI)
-        {
-            RotationRadians -= DirectX::XM_2PI;
-        }
-
-        const DirectX::XMMATRIX WorldMatrix =
-            DirectX::XMMatrixRotationX(RotationRadians * 0.5f) *
-            DirectX::XMMatrixRotationY(RotationRadians);
-
-        const DirectX::XMMATRIX ViewMatrix = Camera.GetViewMatrix();
-
-        const DirectX::XMMATRIX ProjectionMatrix = Camera.GetProjectionMatrix();
-
-        D3D11_MAPPED_SUBRESOURCE MappedResource{};
-
-        HRESULT Result = DeviceContext->Map(TransformBuffer.Get(), 0,
-                                            D3D11_MAP_WRITE_DISCARD, 0,
-                                            &MappedResource);
-
-        if (FAILED(Result))
-        {
-            FLog::Error("Failed to map the transform buffer.");
-
-            return false;
-        }
-
-        auto* TransformData = static_cast<FTransformBuffer*>(MappedResource.
-            pData);
-
-        DirectX::XMStoreFloat4x4(&TransformData->WorldMatrix,
-                                 DirectX::XMMatrixTranspose(WorldMatrix));
-
-        DirectX::XMStoreFloat4x4(&TransformData->ViewMatrix,
-                                 DirectX::XMMatrixTranspose(ViewMatrix));
-
-        DirectX::XMStoreFloat4x4(&TransformData->ProjectionMatrix,
-                                 DirectX::XMMatrixTranspose(ProjectionMatrix));
-
-        DeviceContext->Unmap(TransformBuffer.Get(), 0);
+        ENGINE_ASSERT(AssetManager != nullptr);
 
         ID3D11RenderTargetView* RenderTargets[]{RenderTargetView.Get()};
 
@@ -552,21 +547,68 @@ namespace Engine
                                              D3D11_CLEAR_DEPTH |
                                              D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        BasicShader->Bind(*DeviceContext.Get());
-
         ID3D11Buffer* TransformBuffers[]{TransformBuffer.Get()};
 
         DeviceContext->VSSetConstantBuffers(0, 1, TransformBuffers);
-
-        CheckerTexture->Bind(*DeviceContext.Get(), 0);
 
         ID3D11SamplerState* Samplers[]{SamplerState.Get()};
 
         DeviceContext->PSSetSamplers(0, 1, Samplers);
 
-        CubeMesh->Draw(*DeviceContext.Get());
+        const DirectX::XMMATRIX ViewMatrix = Camera.GetViewMatrix();
 
-        Result = SwapChain->Present(1, 0);
+        const DirectX::XMMATRIX ProjectionMatrix = Camera.GetProjectionMatrix();
+
+        for (const auto& GameObjectPointer : Scene.GetGameObjects())
+        {
+            const FGameObject& GameObject = *GameObjectPointer;
+
+            if (!GameObject.IsActive())
+            {
+                continue;
+            }
+
+            const auto* MeshRenderer = GameObject.GetComponent<
+                FMeshRendererComponent>();
+
+            if (MeshRenderer == nullptr || !MeshRenderer->IsEnabled() || !
+                MeshRenderer->IsVisible())
+            {
+                continue;
+            }
+
+            FMesh* Mesh = AssetManager->FindMesh(MeshRenderer->GetMeshName());
+
+            FShader* Shader = AssetManager->FindShader(
+                MeshRenderer->GetShaderName());
+
+            FTexture* Texture = AssetManager->FindTexture(
+                MeshRenderer->GetTextureName());
+
+            if (Mesh == nullptr || Shader == nullptr || Texture == nullptr)
+            {
+                FLog::Error("A game object references a missing asset.");
+
+                return false;
+            }
+
+            const DirectX::XMMATRIX WorldMatrix = GameObject.GetTransform().
+                GetWorldMatrix();
+
+            if (!UpdateTransformBuffer(WorldMatrix, ViewMatrix,
+                                       ProjectionMatrix))
+            {
+                return false;
+            }
+
+            Shader->Bind(*DeviceContext.Get());
+
+            Texture->Bind(*DeviceContext.Get(), 0);
+
+            Mesh->Draw(*DeviceContext.Get());
+        }
+
+        const HRESULT Result = SwapChain->Present(1, 0);
 
         if (FAILED(Result))
         {

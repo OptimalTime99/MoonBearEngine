@@ -2,16 +2,16 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.07
+ * 파일 수정일 : 26.09.13
  *
- * 파일 개요 : FEngine의 실행 흐름과 Application 생명주기 구현
- * Window, Input, Timer, D3D11 Renderer를 생성하고 게임 루프를 실행
+ * 파일 개요 : Engine 실행 흐름과 Application 및 Scene 생명주기 구현
  */
 
 #include <Engine/Core/Engine.h>
 
 #include <Engine/Core/Application.h>
 #include <Engine/Core/Log.h>
+#include <Engine/Scene/Scene.h>
 
 #include "Core/Timer.h"
 #include "Platform/Windows/WindowsInput.h"
@@ -37,10 +37,6 @@ namespace Engine
             return EXIT_FAILURE;
         }
 
-        /*
-         * 생성의 역순으로 Renderer가 Window보다 먼저 제거되도록
-         * Window 다음에 Renderer를 생성한다.
-         */
         FD3D11Renderer Renderer;
 
         if (!Renderer.Initialize(Window))
@@ -50,17 +46,28 @@ namespace Engine
             return EXIT_FAILURE;
         }
 
-        if (!Application.OnInitialize())
+        FScene Scene;
+
+        if (!Application.OnInitialize(Scene))
         {
             FLog::Error("Application initialization failed.");
 
+            Application.OnShutdown(Scene);
+            return EXIT_FAILURE;
+        }
+
+        if (!Scene.Initialize())
+        {
+            FLog::Error("Scene initialization failed.");
+
+            Application.OnShutdown(Scene);
             return EXIT_FAILURE;
         }
 
         FTimer Timer;
         Timer.Reset();
 
-        bool HasRuntimeError = false;
+        bool bHasRuntimeError = false;
 
         while (!Window.ShouldClose())
         {
@@ -87,7 +94,7 @@ namespace Engine
                 {
                     FLog::Error("Renderer resize failed.");
 
-                    HasRuntimeError = true;
+                    bHasRuntimeError = true;
                     break;
                 }
             }
@@ -96,22 +103,29 @@ namespace Engine
 
             const float DeltaTime = Timer.GetDeltaTime();
 
-            Application.OnUpdate(DeltaTime);
+            /*
+             * 게임 로직이 Scene을 변경한 뒤
+             * Component를 갱신한다.
+             */
+            Application.OnUpdate(DeltaTime, Scene);
 
-            if (!Renderer.Render(DeltaTime))
+            Scene.Update(DeltaTime);
+
+            if (!Renderer.Render(Scene))
             {
                 FLog::Error("Rendering failed.");
 
-                HasRuntimeError = true;
+                bHasRuntimeError = true;
                 break;
             }
         }
 
-        Application.OnShutdown();
+        Application.OnShutdown(Scene);
+        Scene.Shutdown();
 
         FLog::Info("Engine stopped.");
 
-        return HasRuntimeError
+        return bHasRuntimeError
                    ? EXIT_FAILURE
                    : EXIT_SUCCESS;
     }
