@@ -1,0 +1,32 @@
+{
+    "gameObjects": [
+        {
+            "active": true,
+            "meshRenderer": {
+                "mesh": "Cube",
+                "shader": "BasicShader",
+                "texture": "CheckerTexture",
+                "visible": true
+            },
+            "name": "RotatingCube",
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    63.36379623413086,
+                    142.569091796875,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        }
+    ],
+    "version": 1
+}

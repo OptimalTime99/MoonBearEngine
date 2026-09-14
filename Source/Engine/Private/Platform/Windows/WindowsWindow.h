@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.06
+ * 파일 수정일 : 26.09.14
  *
  * 클래스 개요 : Win32 창 생성과 Windows 메시지 처리를 담당하는 클래스
  * 키보드 입력, 창 종료, 클라이언트 영역 크기 변경 상태를 관리
@@ -24,6 +24,8 @@
 
 namespace Engine
 {
+    class IWindowsMessageHandler;
+
     class FWindowsInput;
 
     class FWindowsWindow final
@@ -56,6 +58,9 @@ namespace Engine
                                                 std::uint32_t& OutHeight)
             noexcept;
 
+        void SetMessageHandler(
+            IWindowsMessageHandler* InMessageHandler) noexcept;
+
     private:
         static LRESULT CALLBACK WindowProcedure(HWND WindowHandle, UINT Message,
                                                 WPARAM WParam, LPARAM LParam);
@@ -77,5 +82,7 @@ namespace Engine
 
         bool bShouldClose = false;
         bool bResizeRequested = false;
+
+        IWindowsMessageHandler* MessageHandler = nullptr;
     };
 }

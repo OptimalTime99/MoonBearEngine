@@ -12,6 +12,8 @@
 
 #include "Platform/Windows/WindowsInput.h"
 
+#include "Platform/Windows/WindowsMessageHandler.h"
+
 #include <Engine/Core/Assert.h>
 #include <Engine/Core/Log.h>
 
@@ -191,6 +193,12 @@ namespace Engine
         return true;
     }
 
+    void FWindowsWindow::SetMessageHandler(
+        IWindowsMessageHandler* InMessageHandler) noexcept
+    {
+        MessageHandler = InMessageHandler;
+    }
+
     LRESULT CALLBACK FWindowsWindow::WindowProcedure(
         const HWND InWindowHandle, const UINT Message, const WPARAM WParam,
         const LPARAM LParam)
@@ -214,6 +222,7 @@ namespace Engine
                 InWindowHandle, GWLP_USERDATA));
         }
 
+
         if (Window != nullptr)
         {
             return Window->HandleMessage(InWindowHandle, Message, WParam,
@@ -228,6 +237,17 @@ namespace Engine
                                           const WPARAM WParam,
                                           const LPARAM LParam)
     {
+        if (MessageHandler != nullptr)
+        {
+            LRESULT HandlerResult = 0;
+
+            if (MessageHandler->ProcessWindowMessage(
+                WindowHandle, Message, WParam, LParam, HandlerResult))
+            {
+                return HandlerResult;
+            }
+        }
+
         switch (Message)
         {
         case WM_CLOSE:

@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.13
+ * 파일 수정일 : 26.09.14
  *
  * 파일 개요 : Scene의 GameObject 소유와 생명주기 구현
  */
@@ -12,12 +12,13 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Scene/GameObject.h>
 
+#include <algorithm>
 #include <utility>
 
 namespace Engine
 {
     FScene::FScene() = default;
-    
+
     FScene::~FScene()
     {
         Shutdown();
@@ -41,6 +42,53 @@ namespace Engine
         }
 
         return Result;
+    }
+
+    bool FScene::DestroyGameObject(FGameObject& GameObject)
+    {
+        const auto Iterator = std::find_if(GameObjects.begin(),
+                                           GameObjects.end(),
+                                           [&GameObject](
+                                           const std::unique_ptr<FGameObject>&
+                                           Candidate)
+                                           {
+                                               return Candidate.get() == &
+                                                   GameObject;
+                                           });
+
+        if (Iterator == GameObjects.end())
+        {
+            return false;
+        }
+
+        if (bInitialized)
+        {
+            (*Iterator)->Shutdown();
+        }
+
+        GameObjects.erase(Iterator);
+
+        return true;
+    }
+
+    void FScene::Clear()
+    {
+        const bool bWasInitialized = bInitialized;
+
+        Shutdown();
+
+        GameObjects.clear();
+
+        /*
+         * 실행 중 Scene을 비운 경우 실행 상태를 유지한다.
+         * 이후 생성되는 GameObject는 즉시 초기화된다.
+         */
+        bInitialized = bWasInitialized;
+    }
+
+    bool FScene::IsInitialized() const noexcept
+    {
+        return bInitialized;
     }
 
     FGameObject* FScene::FindGameObject(const std::string& Name) noexcept

@@ -42,7 +42,15 @@ namespace Engine
 
         bool Resize(std::uint32_t Width, std::uint32_t Height);
 
-        bool Render(const FScene& Scene);
+        void BeginFrame();
+
+        bool RenderScene(const FScene& Scene);
+
+        bool EndFrame();
+
+        [[nodiscard]] ID3D11Device& GetDevice() noexcept;
+
+        [[nodiscard]] ID3D11DeviceContext& GetDeviceContext() noexcept;
 
     private:
         bool CreateDeviceAndSwapChain(const FWindowsWindow& Window);

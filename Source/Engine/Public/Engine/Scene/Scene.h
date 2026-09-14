@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.13
+ * 파일 수정일 : 26.09.14
  *
  * 파일 개요 : GameObject의 생성, 소유, 갱신, 종료를 관리하는 Scene
  */
@@ -28,6 +28,12 @@ namespace Engine
         FScene& operator=(const FScene&) = delete;
 
         FGameObject& CreateGameObject(std::string Name);
+
+        bool DestroyGameObject(FGameObject& GameObject);
+
+        void Clear();
+
+        [[nodiscard]] bool IsInitialized() const noexcept;
 
         [[nodiscard]] FGameObject* FindGameObject(
             const std::string& Name) noexcept;

@@ -14,6 +14,7 @@
 #include <Engine/Scene/Scene.h>
 
 #include "Core/Timer.h"
+#include "Editor/Editor.h"
 #include "Platform/Windows/WindowsInput.h"
 #include "Platform/Windows/WindowsWindow.h"
 #include "Renderer/D3D11/D3D11Renderer.h"
@@ -42,6 +43,15 @@ namespace Engine
         if (!Renderer.Initialize(Window))
         {
             FLog::Error("Renderer initialization failed.");
+
+            return EXIT_FAILURE;
+        }
+
+        FEditor Editor;
+
+        if (!Editor.Initialize(Window, Renderer))
+        {
+            FLog::Error("Editor initialization failed.");
 
             return EXIT_FAILURE;
         }
@@ -111,9 +121,29 @@ namespace Engine
 
             Scene.Update(DeltaTime);
 
-            if (!Renderer.Render(Scene))
+            Editor.BeginFrame();
+            Editor.Draw(Scene);
+
+            Renderer.BeginFrame();
+
+            const bool bSceneRendered = Renderer.RenderScene(Scene);
+
+            /*
+             * Scene 렌더링 결과 위에 Editor UI를 그린다.
+             */
+            Editor.EndFrame();
+
+            if (!bSceneRendered)
             {
-                FLog::Error("Rendering failed.");
+                FLog::Error("Scene rendering failed.");
+
+                bHasRuntimeError = true;
+                break;
+            }
+
+            if (!Renderer.EndFrame())
+            {
+                FLog::Error("Frame presentation failed.");
 
                 bHasRuntimeError = true;
                 break;
@@ -122,6 +152,7 @@ namespace Engine
 
         Application.OnShutdown(Scene);
         Scene.Shutdown();
+        Editor.Shutdown();
 
         FLog::Info("Engine stopped.");
 

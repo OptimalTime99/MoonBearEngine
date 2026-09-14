@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.13
+ * 파일 수정일 : 26.09.14
  *
  * 파일 개요 : GameObject와 Component 생명주기 구현
  */
@@ -26,6 +26,16 @@ namespace Engine
     const std::string& FGameObject::GetName() const noexcept
     {
         return Name;
+    }
+
+    void FGameObject::SetName(std::string InName)
+    {
+        if (InName.empty())
+        {
+            return;
+        }
+
+        Name = std::move(InName);
     }
 
     FTransform& FGameObject::GetTransform() noexcept

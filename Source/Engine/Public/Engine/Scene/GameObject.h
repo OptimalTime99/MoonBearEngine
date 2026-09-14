@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.13
+ * 파일 수정일 : 26.09.14
  *
  * 파일 개요 : Transform과 Component를 소유하는 Scene Object
  */
@@ -31,6 +31,8 @@ namespace Engine
         FGameObject& operator=(const FGameObject&) = delete;
 
         [[nodiscard]] const std::string& GetName() const noexcept;
+        
+        void SetName(std::string InName);
 
         [[nodiscard]] FTransform& GetTransform() noexcept;
 

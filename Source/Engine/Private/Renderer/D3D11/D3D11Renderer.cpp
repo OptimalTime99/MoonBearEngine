@@ -526,14 +526,11 @@ namespace Engine
         return true;
     }
 
-    bool FD3D11Renderer::Render(const FScene& Scene)
+    void FD3D11Renderer::BeginFrame()
     {
         ENGINE_ASSERT(DeviceContext != nullptr);
         ENGINE_ASSERT(RenderTargetView != nullptr);
         ENGINE_ASSERT(DepthStencilView != nullptr);
-        ENGINE_ASSERT(TransformBuffer != nullptr);
-        ENGINE_ASSERT(SamplerState != nullptr);
-        ENGINE_ASSERT(AssetManager != nullptr);
 
         ID3D11RenderTargetView* RenderTargets[]{RenderTargetView.Get()};
 
@@ -546,6 +543,14 @@ namespace Engine
         DeviceContext->ClearDepthStencilView(DepthStencilView.Get(),
                                              D3D11_CLEAR_DEPTH |
                                              D3D11_CLEAR_STENCIL, 1.0f, 0);
+    }
+
+    bool FD3D11Renderer::RenderScene(const FScene& Scene)
+    {
+        ENGINE_ASSERT(DeviceContext != nullptr);
+        ENGINE_ASSERT(TransformBuffer != nullptr);
+        ENGINE_ASSERT(SamplerState != nullptr);
+        ENGINE_ASSERT(AssetManager != nullptr);
 
         ID3D11Buffer* TransformBuffers[]{TransformBuffer.Get()};
 
@@ -587,7 +592,7 @@ namespace Engine
 
             if (Mesh == nullptr || Shader == nullptr || Texture == nullptr)
             {
-                FLog::Error("A game object references a missing asset.");
+                FLog::Error("A GameObject references a missing asset.");
 
                 return false;
             }
@@ -608,6 +613,11 @@ namespace Engine
             Mesh->Draw(*DeviceContext.Get());
         }
 
+        return true;
+    }
+
+    bool FD3D11Renderer::EndFrame()
+    {
         const HRESULT Result = SwapChain->Present(1, 0);
 
         if (FAILED(Result))
@@ -618,5 +628,17 @@ namespace Engine
         }
 
         return true;
+    }
+
+    ID3D11Device& FD3D11Renderer::GetDevice() noexcept
+    {
+        ENGINE_ASSERT(Device != nullptr);
+        return *Device.Get();
+    }
+
+    ID3D11DeviceContext& FD3D11Renderer::GetDeviceContext() noexcept
+    {
+        ENGINE_ASSERT(DeviceContext != nullptr);
+        return *DeviceContext.Get();
     }
 }
