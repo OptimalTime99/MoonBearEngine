@@ -1,10 +1,11 @@
-/*
+﻿/*
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.14
- * 파일 수정일 : 26.09.14
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : ImGui 기반 최소 Scene Editor
+ * 파일 개요 : ImGui 기반 Scene Editor와
+ * Edit/Play Mode 사용자 명령 관리
  */
 
 #pragma once
@@ -14,9 +15,23 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <string_view>
 
 namespace Engine
 {
+    enum class EEngineMode
+    {
+        Edit,
+        Play
+    };
+
+    enum class EEditorCommand
+    {
+        None,
+        BeginPlay,
+        EndPlay
+    };
+
     class FD3D11Renderer;
     class FGameObject;
     class FScene;
@@ -36,7 +51,12 @@ namespace Engine
         void Shutdown();
 
         void BeginFrame();
-        void Draw(FScene& Scene);
+
+        [[nodiscard]] EEditorCommand Draw(FScene& Scene, EEngineMode Mode,
+                                          std::string_view PlayStatusText);
+
+        void ClearSelection() noexcept;
+
         void EndFrame();
 
         bool ProcessWindowMessage(HWND WindowHandle, UINT Message,
@@ -44,9 +64,12 @@ namespace Engine
                                   LRESULT& OutResult) override;
 
     private:
-        void DrawMainMenu(FScene& Scene);
-        void DrawHierarchy(FScene& Scene);
-        void DrawInspector(FScene& Scene);
+        [[nodiscard]] EEditorCommand DrawMainMenu(
+            FScene& Scene, EEngineMode Mode, std::string_view PlayStatusText);
+
+        void DrawHierarchy(FScene& Scene, EEngineMode Mode);
+
+        void DrawInspector(FScene& Scene, EEngineMode Mode);
 
         FGameObject& CreateCube(FScene& Scene);
 

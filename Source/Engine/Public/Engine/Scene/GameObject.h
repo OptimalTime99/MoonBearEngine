@@ -1,4 +1,4 @@
-﻿/*
+/*
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
@@ -31,7 +31,7 @@ namespace Engine
         FGameObject& operator=(const FGameObject&) = delete;
 
         [[nodiscard]] const std::string& GetName() const noexcept;
-        
+
         void SetName(std::string InName);
 
         [[nodiscard]] FTransform& GetTransform() noexcept;
@@ -63,6 +63,18 @@ namespace Engine
                 }
 
                 ComponentPointer->bInitialized = true;
+
+                if (bPlaying)
+                {
+                    if (!ComponentPointer->OnBeginPlay())
+                    {
+                        ComponentPointer->OnShutdown();
+                        ComponentPointer->bInitialized = false;
+                        return nullptr;
+                    }
+
+                    ComponentPointer->bPlaying = true;
+                }
             }
 
             Components.emplace_back(std::move(NewComponent));
@@ -105,7 +117,9 @@ namespace Engine
         friend class FScene;
 
         bool Initialize();
+        bool BeginPlay();
         void Update(float DeltaTime);
+        void EndPlay();
         void Shutdown();
 
     private:
@@ -116,5 +130,6 @@ namespace Engine
 
         bool bActive = true;
         bool bInitialized = false;
+        bool bPlaying = false;
     };
 }

@@ -41,7 +41,16 @@ namespace Engine
         return true;
     }
 
+    bool FComponent::OnBeginPlay()
+    {
+        return true;
+    }
+
     void FComponent::OnUpdate(float)
+    {
+    }
+
+    void FComponent::OnEndPlay()
     {
     }
 

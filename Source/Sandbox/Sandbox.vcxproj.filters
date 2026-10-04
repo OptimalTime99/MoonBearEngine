@@ -15,10 +15,20 @@
     <ClCompile Include="SandboxApplication.cpp">
       <Filter>02 Game\Sandbox</Filter>
     </ClCompile>
+    <ClCompile Include="Gameplay\CollectibleComponent.cpp" />
+    <ClCompile Include="Gameplay\GameState.cpp" />
+    <ClCompile Include="Gameplay\GoalComponent.cpp" />
+    <ClCompile Include="Gameplay\PlayerControllerComponent.cpp" />
+    <ClCompile Include="RotatingComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SandboxApplication.h">
       <Filter>02 Game\Sandbox</Filter>
     </ClInclude>
+    <ClInclude Include="Gameplay\CollectibleComponent.h" />
+    <ClInclude Include="Gameplay\GameState.h" />
+    <ClInclude Include="Gameplay\GoalComponent.h" />
+    <ClInclude Include="Gameplay\PlayerControllerComponent.h" />
+    <ClInclude Include="RotatingComponent.h" />
   </ItemGroup>
 </Project>

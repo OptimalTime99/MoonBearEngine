@@ -2,9 +2,9 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.14
- * 파일 수정일 : 26.09.14
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : Scene JSON 직렬화 및 역직렬화 구현
+ * 파일 개요 : Scene의 JSON 문자열 직렬화, 역직렬화와 파일 입출력 구현
  */
 
 #include "Serialization/SceneSerializer.h"
@@ -20,7 +20,9 @@
 #include <array>
 #include <exception>
 #include <fstream>
+#include <iterator>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace
@@ -40,16 +42,120 @@ namespace
         std::string ShaderName;
         std::string TextureName;
     };
+
+    bool ReadObjects(const nlohmann::json& Root,
+                     std::vector<FSerializedGameObject>& OutObjects)
+    {
+        if (Root.at("version").get<int>() != 1)
+        {
+            Engine::FLog::Error("Unsupported scene version.");
+            return false;
+        }
+
+        const auto& ObjectsJson = Root.at("gameObjects");
+
+        if (!ObjectsJson.is_array())
+        {
+            Engine::FLog::Error("The scene object list is invalid.");
+            return false;
+        }
+
+        OutObjects.clear();
+        OutObjects.reserve(ObjectsJson.size());
+
+        for (const auto& ObjectJson : ObjectsJson)
+        {
+            FSerializedGameObject Data;
+
+            Data.Name = ObjectJson.at("name").get<std::string>();
+            Data.bActive = ObjectJson.value("active", true);
+
+            if (Data.Name.empty())
+            {
+                Engine::FLog::Error("A scene object has an empty name.");
+                return false;
+            }
+
+            const auto& TransformJson = ObjectJson.at("transform");
+
+            Data.Position = TransformJson.at("position").get<std::array<
+                float, 3>>();
+
+            Data.Rotation = TransformJson.at("rotation").get<std::array<
+                float, 3>>();
+
+            Data.Scale = TransformJson.at("scale").get<std::array<float, 3>>();
+
+            if (ObjectJson.contains("meshRenderer"))
+            {
+                const auto& RendererJson = ObjectJson.at("meshRenderer");
+
+                Data.bHasMeshRenderer = true;
+                Data.bMeshVisible = RendererJson.value("visible", true);
+
+                Data.MeshName = RendererJson.at("mesh").get<std::string>();
+
+                Data.ShaderName = RendererJson.at("shader").get<std::string>();
+
+                Data.TextureName = RendererJson.at("texture").get<
+                    std::string>();
+            }
+
+            OutObjects.emplace_back(std::move(Data));
+        }
+
+        return true;
+    }
+
+    bool ApplyObjects(Engine::FScene& Scene,
+                      const std::vector<FSerializedGameObject>& Objects)
+    {
+        Scene.Clear();
+
+        for (const FSerializedGameObject& Data : Objects)
+        {
+            Engine::FGameObject& GameObject = Scene.CreateGameObject(Data.Name);
+
+            GameObject.SetActive(Data.bActive);
+
+            GameObject.GetTransform().SetPosition(
+                Data.Position[0], Data.Position[1], Data.Position[2]);
+
+            GameObject.GetTransform().SetRotationDegrees(
+                Data.Rotation[0], Data.Rotation[1], Data.Rotation[2]);
+
+            GameObject.GetTransform().SetScale(Data.Scale[0], Data.Scale[1],
+                                               Data.Scale[2]);
+
+            if (Data.bHasMeshRenderer)
+            {
+                auto* MeshRenderer = GameObject.AddComponent<
+                    Engine::FMeshRendererComponent>(
+                    Data.MeshName, Data.ShaderName, Data.TextureName);
+
+                if (MeshRenderer == nullptr)
+                {
+                    Engine::FLog::Error("Failed to restore a mesh renderer.");
+
+                    return false;
+                }
+
+                MeshRenderer->SetVisible(Data.bMeshVisible);
+            }
+        }
+
+        return true;
+    }
 }
 
 namespace Engine
 {
-    bool FSceneSerializer::Save(const FScene& Scene,
-                                const std::filesystem::path& FilePath)
+    std::string FSceneSerializer::SerializeToString(const FScene& Scene)
     {
         try
         {
             nlohmann::json Root;
+
             Root["version"] = 1;
             Root["gameObjects"] = nlohmann::json::array();
 
@@ -60,9 +166,7 @@ namespace Engine
                 const FTransform& Transform = GameObject.GetTransform();
 
                 const auto& Position = Transform.GetPosition();
-
                 const auto& Rotation = Transform.GetRotationDegrees();
-
                 const auto& Scale = Transform.GetScale();
 
                 nlohmann::json ObjectJson{
@@ -92,7 +196,61 @@ namespace Engine
                 Root["gameObjects"].push_back(std::move(ObjectJson));
             }
 
-            const std::filesystem::path ParentPath = FilePath.parent_path();
+            return Root.dump(4);
+        }
+        catch (const std::exception&)
+        {
+            FLog::Error("Failed to serialize the scene.");
+            return {};
+        }
+    }
+
+    bool FSceneSerializer::DeserializeFromString(
+        FScene& Scene, const std::string_view JsonText)
+    {
+        try
+        {
+            if (JsonText.empty())
+            {
+                FLog::Error("The scene JSON text is empty.");
+                return false;
+            }
+
+            const nlohmann::json Root = nlohmann::json::parse(
+                JsonText.begin(), JsonText.end());
+
+            std::vector<FSerializedGameObject> Objects;
+
+            /*
+             * Scene을 지우기 전에 JSON 전체를 먼저 검증한다.
+             */
+            if (!ReadObjects(Root, Objects))
+            {
+                return false;
+            }
+
+            return ApplyObjects(Scene, Objects);
+        }
+        catch (const std::exception&)
+        {
+            FLog::Error("The scene JSON is invalid.");
+            return false;
+        }
+    }
+
+    bool FSceneSerializer::Save(const FScene& Scene,
+                                const std::filesystem::path& FilePath)
+    {
+        const std::string JsonText = SerializeToString(Scene);
+
+        if (JsonText.empty())
+        {
+            return false;
+        }
+
+        try
+        {
+            const auto ParentPath = FilePath.parent_path();
 
             if (!ParentPath.empty())
             {
@@ -108,7 +266,7 @@ namespace Engine
                 return false;
             }
 
-            OutputFile << Root.dump(4);
+            OutputFile << JsonText;
 
             if (!OutputFile.good())
             {
@@ -118,7 +276,6 @@ namespace Engine
             }
 
             FLog::Info("Scene saved.");
-
             return true;
         }
         catch (const std::exception&)
@@ -139,122 +296,25 @@ namespace Engine
             if (!InputFile.is_open())
             {
                 FLog::Error("Failed to open the scene file.");
-
                 return false;
             }
 
-            nlohmann::json Root;
-            InputFile >> Root;
+            const std::string JsonText{
+                std::istreambuf_iterator<char>{InputFile},
+                std::istreambuf_iterator<char>{}
+            };
 
-            if (Root.at("version").get<int>() != 1)
+            if (!DeserializeFromString(Scene, JsonText))
             {
-                FLog::Error("Unsupported scene file version.");
-
                 return false;
-            }
-
-            const auto& ObjectsJson = Root.at("gameObjects");
-
-            if (!ObjectsJson.is_array())
-            {
-                FLog::Error("The scene object list is invalid.");
-
-                return false;
-            }
-
-            /*
-             * 기존 Scene을 지우기 전에 전체 JSON을 먼저 검증한다.
-             */
-            std::vector<FSerializedGameObject> SerializedObjects;
-
-            SerializedObjects.reserve(ObjectsJson.size());
-
-            for (const auto& ObjectJson : ObjectsJson)
-            {
-                FSerializedGameObject Data;
-
-                Data.Name = ObjectJson.at("name").get<std::string>();
-
-                Data.bActive = ObjectJson.value("active", true);
-
-                const auto& TransformJson = ObjectJson.at("transform");
-
-                Data.Position = TransformJson.at("position").get<std::array<
-                    float, 3>>();
-
-                Data.Rotation = TransformJson.at("rotation").get<std::array<
-                    float, 3>>();
-
-                Data.Scale = TransformJson.at("scale").get<std::array<
-                    float, 3>>();
-
-                if (ObjectJson.contains("meshRenderer"))
-                {
-                    const auto& RendererJson = ObjectJson.at("meshRenderer");
-
-                    Data.bMeshVisible = RendererJson.value("visible", true);
-
-                    Data.bHasMeshRenderer = true;
-
-                    Data.MeshName = RendererJson.at("mesh").get<std::string>();
-
-                    Data.ShaderName = RendererJson.at("shader").get<
-                        std::string>();
-
-                    Data.TextureName = RendererJson.at("texture").get<
-                        std::string>();
-                }
-
-                if (Data.Name.empty())
-                {
-                    FLog::Error("A scene object has an empty name.");
-
-                    return false;
-                }
-
-                SerializedObjects.emplace_back(std::move(Data));
-            }
-
-            Scene.Clear();
-
-            for (const FSerializedGameObject& Data : SerializedObjects)
-            {
-                FGameObject& GameObject = Scene.CreateGameObject(Data.Name);
-
-                GameObject.SetActive(Data.bActive);
-
-                GameObject.GetTransform().SetPosition(
-                    Data.Position[0], Data.Position[1], Data.Position[2]);
-
-                GameObject.GetTransform().SetRotationDegrees(
-                    Data.Rotation[0], Data.Rotation[1], Data.Rotation[2]);
-
-                GameObject.GetTransform().SetScale(
-                    Data.Scale[0], Data.Scale[1], Data.Scale[2]);
-
-                if (Data.bHasMeshRenderer)
-                {
-                    auto* MeshRenderer = GameObject.AddComponent<
-                        FMeshRendererComponent>(Data.MeshName, Data.ShaderName,
-                                                Data.TextureName);
-                    if (MeshRenderer == nullptr)
-                    {
-                        FLog::Error("Failed to restore a mesh renderer.");
-
-                        return false;
-                    }
-
-                    MeshRenderer->SetVisible(Data.bMeshVisible);
-                }
             }
 
             FLog::Info("Scene loaded.");
-
             return true;
         }
         catch (const std::exception&)
         {
-            FLog::Error("The scene file is invalid.");
+            FLog::Error("An exception occurred while loading the scene.");
 
             return false;
         }

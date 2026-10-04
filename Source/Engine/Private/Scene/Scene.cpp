@@ -39,6 +39,11 @@ namespace Engine
         if (bInitialized)
         {
             Result.Initialize();
+
+            if (bPlaying)
+            {
+                Result.BeginPlay();
+            }
         }
 
         return Result;
@@ -84,11 +89,17 @@ namespace Engine
          * 이후 생성되는 GameObject는 즉시 초기화된다.
          */
         bInitialized = bWasInitialized;
+        bPlaying = false;
     }
 
     bool FScene::IsInitialized() const noexcept
     {
         return bInitialized;
+    }
+
+    bool FScene::IsPlaying() const noexcept
+    {
+        return bPlaying;
     }
 
     FGameObject* FScene::FindGameObject(const std::string& Name) noexcept
@@ -146,9 +157,39 @@ namespace Engine
         return true;
     }
 
-    void FScene::Update(const float DeltaTime)
+    bool FScene::BeginPlay()
     {
         if (!bInitialized)
+        {
+            return false;
+        }
+
+        if (bPlaying)
+        {
+            return true;
+        }
+
+        for (const auto& GameObject : GameObjects)
+        {
+            if (!GameObject->BeginPlay())
+            {
+                for (auto Iterator = GameObjects.rbegin(); Iterator !=
+                     GameObjects.rend(); ++Iterator)
+                {
+                    (*Iterator)->EndPlay();
+                }
+
+                return false;
+            }
+        }
+
+        bPlaying = true;
+        return true;
+    }
+
+    void FScene::Update(const float DeltaTime)
+    {
+        if (!bInitialized || !bPlaying)
         {
             return;
         }
@@ -165,8 +206,26 @@ namespace Engine
         }
     }
 
+    void FScene::EndPlay()
+    {
+        if (!bPlaying)
+        {
+            return;
+        }
+
+        for (auto Iterator = GameObjects.rbegin(); Iterator != GameObjects.
+             rend(); ++Iterator)
+        {
+            (*Iterator)->EndPlay();
+        }
+
+        bPlaying = false;
+    }
+
     void FScene::Shutdown()
     {
+        EndPlay();
+
         if (!bInitialized)
         {
             return;

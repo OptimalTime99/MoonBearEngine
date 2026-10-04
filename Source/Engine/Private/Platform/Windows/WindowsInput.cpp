@@ -2,23 +2,15 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.09.06
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : Win32 키보드 상태 저장과 ESC 키 입력 판별 구현
- * 유효하지 않은 키 코드는 배열에 접근하지 않도록 검사
+ * 파일 개요 : Win32 키 상태 저장 및 Engine 키 입력으로의 변환 구현
  */
 
 #include "Platform/Windows/WindowsInput.h"
 
-#include <algorithm>
-
 namespace Engine
 {
-    namespace
-    {
-        constexpr std::uint32_t EscapeKeyCode = 0x1B;
-    }
-
     void FWindowsInput::BeginFrame() noexcept
     {
         PreviousKeys = CurrentKeys;
@@ -41,8 +33,42 @@ namespace Engine
         PreviousKeys.fill(false);
     }
 
-    bool FWindowsInput::IsEscapePressed() const noexcept
+    bool FWindowsInput::IsKeyDown(const EKey Key) const noexcept
     {
-        return CurrentKeys[EscapeKeyCode] && !PreviousKeys[EscapeKeyCode];
+        const std::uint32_t KeyCode = ToVirtualKey(Key);
+
+        return KeyCode < CurrentKeys.size() && CurrentKeys[KeyCode];
+    }
+
+    bool FWindowsInput::IsKeyPressed(const EKey Key) const noexcept
+    {
+        const std::uint32_t KeyCode = ToVirtualKey(Key);
+
+        return KeyCode < CurrentKeys.size() && CurrentKeys[KeyCode] && !
+            PreviousKeys[KeyCode];
+    }
+
+    std::uint32_t FWindowsInput::ToVirtualKey(const EKey Key) noexcept
+    {
+        switch (Key)
+        {
+        case EKey::W:
+            return 'W';
+
+        case EKey::A:
+            return 'A';
+
+        case EKey::S:
+            return 'S';
+
+        case EKey::D:
+            return 'D';
+
+        case EKey::Escape:
+            return 0x1B;
+
+        default:
+            return 0;
+        }
     }
 }

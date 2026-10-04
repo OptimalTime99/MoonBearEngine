@@ -84,6 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,6 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\Engine\Public</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,6 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\Engine\Public</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,11 +146,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Gameplay\CollectibleComponent.cpp" />
+    <ClCompile Include="Gameplay\GameState.cpp" />
+    <ClCompile Include="Gameplay\GoalComponent.cpp" />
+    <ClCompile Include="Gameplay\PlayerControllerComponent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RotatingComponent.cpp" />
     <ClCompile Include="SandboxApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gameplay\CollectibleComponent.h" />
+    <ClInclude Include="Gameplay\GameState.h" />
+    <ClInclude Include="Gameplay\GoalComponent.h" />
+    <ClInclude Include="Gameplay\PlayerControllerComponent.h" />
     <ClInclude Include="RotatingComponent.h" />
     <ClInclude Include="SandboxApplication.h" />
   </ItemGroup>

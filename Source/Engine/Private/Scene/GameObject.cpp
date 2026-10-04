@@ -2,9 +2,9 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.14
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : GameObject와 Component 생명주기 구현
+ * 파일 개요 : GameObject와 Component의 객체 및 Play 생명주기 구현
  */
 
 #include <Engine/Scene/GameObject.h>
@@ -92,9 +92,50 @@ namespace Engine
         return true;
     }
 
+    bool FGameObject::BeginPlay()
+    {
+        if (!bInitialized)
+        {
+            return false;
+        }
+
+        if (bPlaying)
+        {
+            return true;
+        }
+
+        for (const auto& Component : Components)
+        {
+            if (!Component->bInitialized)
+            {
+                continue;
+            }
+
+            if (!Component->OnBeginPlay())
+            {
+                for (auto Iterator = Components.rbegin(); Iterator != Components
+                     .rend(); ++Iterator)
+                {
+                    if ((*Iterator)->bPlaying)
+                    {
+                        (*Iterator)->OnEndPlay();
+                        (*Iterator)->bPlaying = false;
+                    }
+                }
+
+                return false;
+            }
+
+            Component->bPlaying = true;
+        }
+
+        bPlaying = true;
+        return true;
+    }
+
     void FGameObject::Update(const float DeltaTime)
     {
-        if (!bInitialized || !bActive)
+        if (!bInitialized || !bPlaying || !bActive)
         {
             return;
         }
@@ -116,8 +157,30 @@ namespace Engine
         }
     }
 
+    void FGameObject::EndPlay()
+    {
+        if (!bPlaying)
+        {
+            return;
+        }
+
+        for (auto Iterator = Components.rbegin(); Iterator != Components.rend();
+             ++Iterator)
+        {
+            if ((*Iterator)->bPlaying)
+            {
+                (*Iterator)->OnEndPlay();
+                (*Iterator)->bPlaying = false;
+            }
+        }
+
+        bPlaying = false;
+    }
+
     void FGameObject::Shutdown()
     {
+        EndPlay();
+
         if (!bInitialized)
         {
             return;

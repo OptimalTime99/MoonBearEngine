@@ -1,10 +1,11 @@
-/*
+﻿/*
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.14
- * 파일 수정일 : 26.09.14
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : ImGui 초기화와 Hierarchy, Inspector, Scene 저장 UI 구현
+ * 파일 개요 : ImGui 초기화와 Hierarchy, Inspector,
+ * Scene 저장 및 Edit/Play Mode 제어 UI 구현
  */
 
 #include "Editor/Editor.h"
@@ -31,12 +32,8 @@
  * imgui_impl_win32.h는 Windows.h 의존성 전파를 막기 위해
  * Win32 메시지 처리 함수 선언을 노출하지 않는다.
  */
-extern IMGUI_IMPL_API LRESULT
-ImGui_ImplWin32_WndProcHandler(
-    HWND WindowHandle,
-    UINT Message,
-    WPARAM WParam,
-    LPARAM LParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
+    HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
 
 namespace Engine
 {
@@ -61,6 +58,7 @@ namespace Engine
             FLog::Error("Failed to initialize the ImGui Win32 backend.");
 
             ImGui::DestroyContext();
+
             return false;
         }
 
@@ -120,16 +118,26 @@ namespace Engine
         ImGui::NewFrame();
     }
 
-    void FEditor::Draw(FScene& Scene)
+    EEditorCommand FEditor::Draw(FScene& Scene, const EEngineMode Mode,
+                                 const std::string_view PlayStatusText)
     {
         if (!bInitialized)
         {
-            return;
+            return EEditorCommand::None;
         }
 
-        DrawMainMenu(Scene);
-        DrawHierarchy(Scene);
-        DrawInspector(Scene);
+        const EEditorCommand Command =
+            DrawMainMenu(Scene, Mode, PlayStatusText);
+
+        DrawHierarchy(Scene, Mode);
+        DrawInspector(Scene, Mode);
+
+        return Command;
+    }
+
+    void FEditor::ClearSelection() noexcept
+    {
+        SelectedObject = nullptr;
     }
 
     void FEditor::EndFrame()
@@ -159,59 +167,99 @@ namespace Engine
         return OutResult != 0;
     }
 
-    void FEditor::DrawMainMenu(FScene& Scene)
+    EEditorCommand FEditor::DrawMainMenu(FScene& Scene, const EEngineMode Mode,
+                                         const std::string_view PlayStatusText)
     {
+        EEditorCommand Command = EEditorCommand::None;
+
         if (!ImGui::BeginMainMenuBar())
         {
-            return;
+            return Command;
         }
+
+        const bool bIsPlaying = Mode == EEngineMode::Play;
+
+        /*
+         * Play 중에는 편집 Scene을 파일로 저장하거나
+         * 다른 Scene으로 교체할 수 없다.
+         */
+        ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
             {
-                if (FSceneSerializer::Save(Scene, ScenePath))
-                {
-                    StatusMessage = "Scene saved.";
-                }
-                else
-                {
-                    StatusMessage = "Failed to save scene.";
-                }
+                StatusMessage = FSceneSerializer::Save(Scene, ScenePath)
+                                    ? "Scene saved."
+                                    : "Failed to save scene.";
             }
 
             if (ImGui::MenuItem("Load Scene", "Ctrl+O"))
             {
                 SelectedObject = nullptr;
 
-                if (FSceneSerializer::Load(Scene, ScenePath))
-                {
-                    StatusMessage = "Scene loaded.";
-                }
-                else
-                {
-                    StatusMessage = "Failed to load scene.";
-                }
+                StatusMessage = FSceneSerializer::Load(Scene, ScenePath)
+                                    ? "Scene loaded."
+                                    : "Failed to load scene.";
             }
 
             ImGui::EndMenu();
         }
 
+        ImGui::EndDisabled();
+
+        ImGui::Separator();
+
+        if (!bIsPlaying)
+        {
+            if (ImGui::Button("Play"))
+            {
+                Command = EEditorCommand::BeginPlay;
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Stop"))
+            {
+                Command = EEditorCommand::EndPlay;
+            }
+        }
+
+        ImGui::Separator();
+
+        if (!PlayStatusText.empty())
+        {
+            ImGui::TextUnformatted(PlayStatusText.data(),
+                                   PlayStatusText.data() + PlayStatusText.
+                                   size());
+        }
+
         if (!StatusMessage.empty())
         {
             ImGui::Separator();
+
             ImGui::TextUnformatted(StatusMessage.c_str());
         }
 
         ImGui::EndMainMenuBar();
+
+        return Command;
     }
 
-    void FEditor::DrawHierarchy(FScene& Scene)
+    void FEditor::DrawHierarchy(FScene& Scene, const EEngineMode Mode)
     {
         ImGui::SetNextWindowSize(ImVec2{280.0f, 500.0f},
                                  ImGuiCond_FirstUseEver);
 
         ImGui::Begin("Hierarchy");
+
+        const bool bIsPlaying = Mode == EEngineMode::Play;
+
+        /*
+         * Play 중에도 객체 선택은 가능하지만
+         * 객체 생성은 불가능하다.
+         */
+        ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::Button("Create Empty"))
         {
@@ -225,6 +273,8 @@ namespace Engine
         {
             SelectedObject = &CreateCube(Scene);
         }
+
+        ImGui::EndDisabled();
 
         ImGui::Separator();
 
@@ -247,7 +297,7 @@ namespace Engine
         ImGui::End();
     }
 
-    void FEditor::DrawInspector(FScene& Scene)
+    void FEditor::DrawInspector(FScene& Scene, const EEngineMode Mode)
     {
         ImGui::SetNextWindowSize(ImVec2{340.0f, 500.0f},
                                  ImGuiCond_FirstUseEver);
@@ -259,6 +309,7 @@ namespace Engine
             ImGui::TextUnformatted("Select a GameObject.");
 
             ImGui::End();
+
             return;
         }
 
@@ -266,6 +317,14 @@ namespace Engine
 
         std::snprintf(NameBuffer.data(), NameBuffer.size(), "%s",
                       SelectedObject->GetName().c_str());
+
+        const bool bIsPlaying = Mode == EEngineMode::Play;
+
+        /*
+         * Play 중에는 Inspector 내용을 볼 수 있지만
+         * 편집하거나 삭제할 수 없다.
+         */
+        ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::InputText("Name", NameBuffer.data(), NameBuffer.size()))
         {
@@ -309,6 +368,7 @@ namespace Engine
             FMeshRendererComponent>())
         {
             ImGui::Separator();
+
             ImGui::TextUnformatted("Mesh Renderer");
 
             ImGui::Text("Mesh: %s", MeshRenderer->GetMeshName().c_str());
@@ -329,6 +389,7 @@ namespace Engine
             Scene.DestroyGameObject(*ObjectToDelete);
         }
 
+        ImGui::EndDisabled();
         ImGui::End();
     }
 

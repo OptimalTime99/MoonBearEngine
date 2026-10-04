@@ -84,6 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,6 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -534,6 +538,7 @@
       <LibCompiled>true</LibCompiled>
     </ClCompile>
     <ClCompile Include="Private\Serialization\SceneSerializer.cpp" />
+    <ClCompile Include="Public\Engine\Input\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Assets\AssetManager.h" />
@@ -553,6 +558,7 @@
     <ClInclude Include="Public\Engine\Core\Assert.h" />
     <ClInclude Include="Public\Engine\Core\Engine.h" />
     <ClInclude Include="Public\Engine\Core\Log.h" />
+    <ClInclude Include="Public\Engine\Input\Input.h" />
     <ClInclude Include="Public\Engine\Scene\Component.h" />
     <ClInclude Include="Public\Engine\Scene\GameObject.h" />
     <ClInclude Include="Public\Engine\Scene\MeshRendererComponent.h" />

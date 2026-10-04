@@ -60,6 +60,18 @@
     <ClCompile Include="Private\Renderer\Camera.cpp">
       <Filter>01 Engine\Engine\Private\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Assets\AssetManager.cpp" />
+    <ClCompile Include="Private\Editor\Editor.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Mesh.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Shader.cpp" />
+    <ClCompile Include="Private\Renderer\Resources\Texture.cpp" />
+    <ClCompile Include="Private\Scene\Component.cpp" />
+    <ClCompile Include="Private\Scene\GameObject.cpp" />
+    <ClCompile Include="Private\Scene\MeshRendererComponent.cpp" />
+    <ClCompile Include="Private\Scene\Scene.cpp" />
+    <ClCompile Include="Private\Scene\Transform.cpp" />
+    <ClCompile Include="Private\Serialization\SceneSerializer.cpp" />
+    <ClCompile Include="Public\Engine\Input\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Core\Timer.h">
@@ -89,6 +101,20 @@
     <ClInclude Include="Private\Renderer\Camera.h">
       <Filter>01 Engine\Engine\Private\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Assets\AssetManager.h" />
+    <ClInclude Include="Private\Editor\Editor.h" />
+    <ClInclude Include="Private\Platform\Windows\WindowsMessageHandler.h" />
+    <ClInclude Include="Private\Renderer\Resources\Mesh.h" />
+    <ClInclude Include="Private\Renderer\Resources\RenderTypes.h" />
+    <ClInclude Include="Private\Renderer\Resources\Shader.h" />
+    <ClInclude Include="Private\Renderer\Resources\Texture.h" />
+    <ClInclude Include="Private\Serialization\SceneSerializer.h" />
+    <ClInclude Include="Public\Engine\Input\Input.h" />
+    <ClInclude Include="Public\Engine\Scene\Component.h" />
+    <ClInclude Include="Public\Engine\Scene\GameObject.h" />
+    <ClInclude Include="Public\Engine\Scene\MeshRendererComponent.h" />
+    <ClInclude Include="Public\Engine\Scene\Scene.h" />
+    <ClInclude Include="Public\Engine\Scene\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Shaders\Basic.hlsl">

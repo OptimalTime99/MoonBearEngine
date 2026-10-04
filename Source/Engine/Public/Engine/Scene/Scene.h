@@ -2,9 +2,10 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.13
- * 파일 수정일 : 26.09.14
+ * 파일 수정일 : 26.10.04
  *
- * 파일 개요 : GameObject의 생성, 소유, 갱신, 종료를 관리하는 Scene
+ * 파일 개요 : GameObject의 생성, 소유, 객체 생명주기와
+ * Play 세션 생명주기를 관리하는 Scene
  */
 
 #pragma once
@@ -35,6 +36,8 @@ namespace Engine
 
         [[nodiscard]] bool IsInitialized() const noexcept;
 
+        [[nodiscard]] bool IsPlaying() const noexcept;
+
         [[nodiscard]] FGameObject* FindGameObject(
             const std::string& Name) noexcept;
 
@@ -45,12 +48,19 @@ namespace Engine
         GetGameObjects() const noexcept;
 
         bool Initialize();
+
+        bool BeginPlay();
+
         void Update(float DeltaTime);
+
+        void EndPlay();
+
         void Shutdown();
 
     private:
         std::vector<std::unique_ptr<FGameObject>> GameObjects;
 
         bool bInitialized = false;
+        bool bPlaying = false;
     };
 }
