@@ -2,10 +2,10 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.10.04
+ * 파일 수정일 : 26.11.01
  *
- * 파일 개요 : 작은 수집 게임의 기본 Scene을 구성하고
- * Play 세션의 Runtime Component와 GameState를 관리
+ * 파일 개요 : 작은 수집 게임의 Scene을 구성하고
+ * Play 세션의 Runtime Component, GameState와 재시작을 관리
  */
 
 #pragma once
@@ -30,13 +30,10 @@ namespace Sandbox
     public:
         FSandboxApplication() = default;
 
-        /*
-         * FGameState는 이 헤더에서 전방 선언만 되어 있으므로
-         * 소멸자는 GameState.h를 포함하는 cpp에서 정의한다.
-         */
         ~FSandboxApplication() override;
 
         FSandboxApplication(const FSandboxApplication&) = delete;
+
         FSandboxApplication& operator=(const FSandboxApplication&) = delete;
 
         bool OnInitialize(Engine::FScene& Scene) override;
@@ -59,12 +56,20 @@ namespace Sandbox
                                                float PositionZ, float ScaleX,
                                                float ScaleY, float ScaleZ);
 
+        void ResetGame(Engine::FScene& Scene);
+
     private:
         /*
          * Play 세션 동안만 존재한다.
-         * Runtime Component는 이 객체를 참조하므로 Scene의
+         * Runtime Component는 GameState를 참조하므로 Scene의
          * Runtime Component가 제거된 후에 파괴해야 한다.
          */
         std::unique_ptr<FGameState> GameState;
+
+        /*
+         * Engine이 소유하는 Input의 비소유 포인터다.
+         * Play 시작 시 연결하고 Play 종료 시 해제한다.
+         */
+        const Engine::IInput* PlayInput = nullptr;
     };
 }

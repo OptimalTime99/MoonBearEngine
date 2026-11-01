@@ -2,10 +2,11 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.14
- * 파일 수정일 : 26.10.04
+ * 파일 수정일 : 26.11.01
  *
  * 파일 개요 : ImGui 초기화와 Hierarchy, Inspector,
- * Scene 저장 및 Edit/Play Mode 제어 UI 구현
+ * Scene 저장, Edit/Play Mode 제어, Gameplay HUD와
+ * Clear 연출 UI를 구현
  */
 
 #include "Editor/Editor.h"
@@ -25,15 +26,108 @@
 #include <imgui_impl_win32.h>
 
 #include <array>
+#include <cmath>
 #include <cstdio>
 #include <string>
 
-/*
- * imgui_impl_win32.h는 Windows.h 의존성 전파를 막기 위해
- * Win32 메시지 처리 함수 선언을 노출하지 않는다.
- */
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
     HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
+namespace
+{
+    void DrawGameplayHud(const Engine::EEngineMode Mode,
+                         const std::string_view PlayStatusText)
+    {
+        if (Mode != Engine::EEngineMode::Play)
+        {
+            return;
+        }
+
+        ImGuiIO& InputOutput = ImGui::GetIO();
+
+        constexpr ImGuiWindowFlags HudFlags = ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings
+            | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav |
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs;
+
+        /*
+         * 일반 플레이 HUD를 화면 중앙 상단에 표시한다.
+         */
+        ImGui::SetNextWindowPos(ImVec2{InputOutput.DisplaySize.x * 0.5f, 48.0f},
+                                ImGuiCond_Always, ImVec2{0.5f, 0.0f});
+
+        ImGui::SetNextWindowBgAlpha(0.75f);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{18.0f, 10.0f});
+
+        if (ImGui::Begin("##GameplayHud", nullptr, HudFlags))
+        {
+            if (!PlayStatusText.empty())
+            {
+                ImGui::TextUnformatted(PlayStatusText.data(),
+                                       PlayStatusText.data() + PlayStatusText.
+                                       size());
+            }
+
+            ImGui::Separator();
+
+            ImGui::TextDisabled("WASD: Move  |  R: Restart");
+        }
+
+        ImGui::End();
+
+        ImGui::PopStyleVar(2);
+
+        /*
+         * Sandbox가 Clear! 상태를 반환하면 화면 중앙에
+         * 시간에 따라 밝기가 변하는 완료 연출을 표시한다.
+         */
+        if (PlayStatusText != "Clear!")
+        {
+            return;
+        }
+
+        const float Time = static_cast<float>(ImGui::GetTime());
+
+        const float Pulse = 0.5f + 0.5f * std::sin(Time * 4.0f);
+
+        ImGui::SetNextWindowPos(ImVec2{
+                                    InputOutput.DisplaySize.x * 0.5f,
+                                    InputOutput.DisplaySize.y * 0.5f
+                                }, ImGuiCond_Always, ImVec2{0.5f, 0.5f});
+
+        ImGui::SetNextWindowBgAlpha(0.65f + Pulse * 0.15f);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 14.0f);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{42.0f, 28.0f});
+
+        if (ImGui::Begin("##ClearOverlay", nullptr, HudFlags))
+        {
+            const ImVec4 ClearColor{
+                0.35f + Pulse * 0.25f, 0.85f + Pulse * 0.15f, 0.35f, 1.0f
+            };
+
+            ImGui::SetWindowFontScale(2.0f);
+
+            ImGui::TextColored(ClearColor, "GAME CLEAR!");
+
+            ImGui::SetWindowFontScale(1.0f);
+
+            ImGui::Spacing();
+
+            ImGui::TextUnformatted("All collectibles found.");
+
+            ImGui::TextDisabled("Press R to play again.");
+        }
+
+        ImGui::End();
+
+        ImGui::PopStyleVar(2);
+    }
+}
 
 namespace Engine
 {
@@ -132,6 +226,12 @@ namespace Engine
         DrawHierarchy(Scene, Mode);
         DrawInspector(Scene, Mode);
 
+        /*
+         * Editor 창과 별도로 게임 화면 위에 HUD를 그린다.
+         * 실제 D3D Scene보다 나중에 렌더링되므로 화면 위에 표시된다.
+         */
+        DrawGameplayHud(Mode, PlayStatusText);
+
         return Command;
     }
 
@@ -179,10 +279,6 @@ namespace Engine
 
         const bool bIsPlaying = Mode == EEngineMode::Play;
 
-        /*
-         * Play 중에는 편집 Scene을 파일로 저장하거나
-         * 다른 Scene으로 교체할 수 없다.
-         */
         ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::BeginMenu("File"))
@@ -255,10 +351,6 @@ namespace Engine
 
         const bool bIsPlaying = Mode == EEngineMode::Play;
 
-        /*
-         * Play 중에도 객체 선택은 가능하지만
-         * 객체 생성은 불가능하다.
-         */
         ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::Button("Create Empty"))
@@ -320,10 +412,6 @@ namespace Engine
 
         const bool bIsPlaying = Mode == EEngineMode::Play;
 
-        /*
-         * Play 중에는 Inspector 내용을 볼 수 있지만
-         * 편집하거나 삭제할 수 없다.
-         */
         ImGui::BeginDisabled(bIsPlaying);
 
         if (ImGui::InputText("Name", NameBuffer.data(), NameBuffer.size()))

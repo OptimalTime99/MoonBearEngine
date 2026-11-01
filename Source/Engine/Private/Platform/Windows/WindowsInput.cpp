@@ -2,7 +2,7 @@
  * 작성자 : 최준혁
  *
  * 파일 생성일 : 26.09.06
- * 파일 수정일 : 26.10.04
+ * 파일 수정일 : 26.11.01
  *
  * 파일 개요 : Win32 키 상태 저장 및 Engine 키 입력으로의 변환 구현
  */
@@ -63,6 +63,9 @@ namespace Engine
 
         case EKey::D:
             return 'D';
+
+        case EKey::R:
+            return 'R';
 
         case EKey::Escape:
             return 0x1B;
