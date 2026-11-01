@@ -119,7 +119,7 @@
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalDependencies>$(CoreLibraryDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib;windowscodecs.lib;ole32.lib;imgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>$(CoreLibraryDependencies);d3d11.lib;dxgi.lib;d3dcompiler.lib;windowscodecs.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,6 +141,10 @@
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\ThirdParty\Imgui\Imgui.vcxproj">
+          <Project>{ee007f79-f1e2-4907-83b3-f5bc9c7707d0}</Project>
+          <Name>Imgui</Name>
+        </ProjectReference>
         <ProjectReference Include="..\Engine\Engine.vcxproj">
             <Project>{2328369a-ddd0-409c-82b3-b62f2a9939cc}</Project>
         </ProjectReference>
@@ -165,4 +169,7 @@
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">
     </ImportGroup>
+    <PropertyGroup Label="Vcpkg">
+      <VcpkgEnabled>false</VcpkgEnabled>
+    </PropertyGroup>
 </Project>
