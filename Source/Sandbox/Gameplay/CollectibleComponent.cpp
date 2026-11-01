@@ -18,10 +18,14 @@
 namespace Sandbox
 {
     FCollectibleComponent::FCollectibleComponent(
-        Engine::FGameObject& Owner, Engine::FGameObject& InPlayer,
-        FGameState& InGameState, const float InTriggerRadius)
-        : FComponent{Owner}, Player{InPlayer}, GameState{InGameState},
-          TriggerRadius{InTriggerRadius}
+        Engine::FGameObject& Owner
+        , Engine::FGameObject& InPlayer
+        , FGameState& InGameState
+        , const float InTriggerRadius)
+        : FComponent{Owner}
+        , Player{InPlayer}
+        , GameState{InGameState}
+        , TriggerRadius{InTriggerRadius}
     {
     }
 

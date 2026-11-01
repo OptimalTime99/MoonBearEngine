@@ -16,8 +16,8 @@ namespace Engine
         PreviousKeys = CurrentKeys;
     }
 
-    void FWindowsInput::SetKeyState(const std::uint32_t KeyCode,
-                                    const bool bIsDown) noexcept
+    void FWindowsInput::SetKeyState(const std::uint32_t KeyCode
+                                    , const bool bIsDown) noexcept
     {
         if (KeyCode >= CurrentKeys.size())
         {

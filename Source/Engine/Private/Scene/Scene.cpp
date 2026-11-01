@@ -51,15 +51,18 @@ namespace Engine
 
     bool FScene::DestroyGameObject(FGameObject& GameObject)
     {
-        const auto Iterator = std::find_if(GameObjects.begin(),
-                                           GameObjects.end(),
-                                           [&GameObject](
-                                           const std::unique_ptr<FGameObject>&
-                                           Candidate)
-                                           {
-                                               return Candidate.get() == &
-                                                   GameObject;
-                                           });
+        const auto Iterator = std::find_if
+        (
+            GameObjects.begin()
+            , GameObjects.end()
+            , [&GameObject](
+            const std::unique_ptr<FGameObject>&
+            Candidate)
+            {
+                return Candidate.get() == &
+                    GameObject;
+            }
+        );
 
         if (Iterator == GameObjects.end())
         {

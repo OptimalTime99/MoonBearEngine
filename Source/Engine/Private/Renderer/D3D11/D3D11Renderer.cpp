@@ -16,8 +16,8 @@
 
 #include "Platform/Windows/WindowsWindow.h"
 
-#include <DirectXMath.h>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
 
 #include "Assets/AssetManager.h"
 
@@ -27,8 +27,8 @@
 #include "Renderer/Resources/Texture.h"
 
 #include <array>
-#include <memory>
 #include <cstdint>
+#include <memory>
 
 #include "Engine/Scene/GameObject.h"
 #include "Engine/Scene/MeshRendererComponent.h"
@@ -43,35 +43,40 @@ namespace
     constexpr std::array<FVertex, 24> CubeVertices{
         {
             // 앞면
-            {{-1, -1, -1}, White, {0, 1}}, {{-1, 1, -1}, White, {0, 0}},
-            {{1, 1, -1}, White, {1, 0}}, {{1, -1, -1}, White, {1, 1}},
+            {{-1, -1, -1}, White, {0, 1}}, {{-1, 1, -1}, White, {0, 0}}
+            , {{1, 1, -1}, White, {1, 0}}, {{1, -1, -1}, White, {1, 1}},
 
             // 뒷면
-            {{1, -1, 1}, White, {0, 1}}, {{1, 1, 1}, White, {0, 0}},
-            {{-1, 1, 1}, White, {1, 0}}, {{-1, -1, 1}, White, {1, 1}},
+            {{1, -1, 1}, White, {0, 1}}
+            , {{1, 1, 1}, White, {0, 0}}, {{-1, 1, 1}, White, {1, 0}}
+            , {{-1, -1, 1}, White, {1, 1}},
 
             // 왼쪽 면
-            {{-1, -1, 1}, White, {0, 1}}, {{-1, 1, 1}, White, {0, 0}},
-            {{-1, 1, -1}, White, {1, 0}}, {{-1, -1, -1}, White, {1, 1}},
+            {{-1, -1, 1}, White, {0, 1}}
+            , {{-1, 1, 1}, White, {0, 0}}, {{-1, 1, -1}, White, {1, 0}}
+            , {{-1, -1, -1}, White, {1, 1}},
 
             // 오른쪽 면
-            {{1, -1, -1}, White, {0, 1}}, {{1, 1, -1}, White, {0, 0}},
-            {{1, 1, 1}, White, {1, 0}}, {{1, -1, 1}, White, {1, 1}},
+            {{1, -1, -1}, White, {0, 1}}
+            , {{1, 1, -1}, White, {0, 0}}, {{1, 1, 1}, White, {1, 0}}
+            , {{1, -1, 1}, White, {1, 1}},
 
             // 위쪽 면
-            {{-1, 1, -1}, White, {0, 1}}, {{-1, 1, 1}, White, {0, 0}},
-            {{1, 1, 1}, White, {1, 0}}, {{1, 1, -1}, White, {1, 1}},
+            {{-1, 1, -1}, White, {0, 1}}
+            , {{-1, 1, 1}, White, {0, 0}}, {{1, 1, 1}, White, {1, 0}}
+            , {{1, 1, -1}, White, {1, 1}},
 
             // 아래쪽 면
-            {{-1, -1, 1}, White, {0, 1}}, {{-1, -1, -1}, White, {0, 0}},
-            {{1, -1, -1}, White, {1, 0}}, {{1, -1, 1}, White, {1, 1}}
+            {{-1, -1, 1}, White, {0, 1}}
+            , {{-1, -1, -1}, White, {0, 0}}, {{1, -1, -1}, White, {1, 0}}
+            , {{1, -1, 1}, White, {1, 1}}
         }
     };
 
     constexpr std::array<std::uint16_t, 36> CubeIndices{
         {
-            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14,
-            12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14
+            , 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
         }
     };
 }
@@ -140,16 +145,22 @@ namespace Engine
 
         D3D_FEATURE_LEVEL CreatedFeatureLevel{};
 
-        HRESULT Result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE,
-                                           nullptr, DeviceFlags,
-                                           RequestedFeatureLevels,
-                                           static_cast<UINT>(
-                                               std::size(
-                                                   RequestedFeatureLevels)),
-                                           D3D11_SDK_VERSION,
-                                           Device.GetAddressOf(),
-                                           &CreatedFeatureLevel,
-                                           DeviceContext.GetAddressOf());
+        HRESULT Result = D3D11CreateDevice
+        (
+            nullptr
+            , D3D_DRIVER_TYPE_HARDWARE
+            , nullptr
+            , DeviceFlags
+            , RequestedFeatureLevels
+            , std::size
+            (
+                RequestedFeatureLevels
+            )
+            , D3D11_SDK_VERSION
+            , Device.GetAddressOf()
+            , &CreatedFeatureLevel
+            , DeviceContext.GetAddressOf()
+        );
 
 #if defined(_DEBUG)
         /*
@@ -158,22 +169,29 @@ namespace Engine
          */
         if (FAILED(Result))
         {
-            FLog::Info(
-                "D3D11 Debug Layer is unavailable. " "Retrying without it.");
+            FLog::Info
+            (
+                "D3D11 Debug Layer is unavailable. " "Retrying without it."
+            );
 
             Device.Reset();
             DeviceContext.Reset();
 
             DeviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
 
-            Result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE,
-                                       nullptr, DeviceFlags,
-                                       RequestedFeatureLevels,
-                                       static_cast<UINT>(
-                                           std::size(RequestedFeatureLevels)),
-                                       D3D11_SDK_VERSION, Device.GetAddressOf(),
-                                       &CreatedFeatureLevel,
-                                       DeviceContext.GetAddressOf());
+            Result = D3D11CreateDevice
+            (
+                nullptr
+                , D3D_DRIVER_TYPE_HARDWARE
+                , nullptr
+                , DeviceFlags
+                , RequestedFeatureLevels
+                , std::size(RequestedFeatureLevels)
+                , D3D11_SDK_VERSION
+                , Device.GetAddressOf()
+                , &CreatedFeatureLevel
+                , DeviceContext.GetAddressOf()
+            );
         }
 #endif
 
@@ -231,9 +249,15 @@ namespace Engine
         SwapChainDescription.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
         SwapChainDescription.Flags = 0;
 
-        Result = Factory->CreateSwapChainForHwnd(
-            Device.Get(), Window.GetNativeHandle(), &SwapChainDescription,
-            nullptr, nullptr, SwapChain.GetAddressOf());
+        Result = Factory->CreateSwapChainForHwnd
+        (
+            Device.Get()
+            , Window.GetNativeHandle()
+            , &SwapChainDescription
+            , nullptr
+            , nullptr
+            , SwapChain.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -246,8 +270,8 @@ namespace Engine
          * DXGI가 Alt+Enter 입력을 처리해
          * 임의로 전체 화면 상태를 변경하지 않도록 한다.
          */
-        Result = Factory->MakeWindowAssociation(Window.GetNativeHandle(),
-                                                DXGI_MWA_NO_ALT_ENTER);
+        Result = Factory->MakeWindowAssociation
+            (Window.GetNativeHandle(), DXGI_MWA_NO_ALT_ENTER);
 
         if (FAILED(Result))
         {
@@ -259,8 +283,8 @@ namespace Engine
         return true;
     }
 
-    bool FD3D11Renderer::CreateRenderTarget(const std::uint32_t Width,
-                                            const std::uint32_t Height)
+    bool FD3D11Renderer::CreateRenderTarget(const std::uint32_t Width
+                                            , const std::uint32_t Height)
     {
         ENGINE_ASSERT(Device != nullptr);
         ENGINE_ASSERT(DeviceContext != nullptr);
@@ -268,8 +292,11 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
 
-        HRESULT Result = SwapChain->GetBuffer(
-            0, IID_PPV_ARGS(BackBuffer.GetAddressOf()));
+        HRESULT Result = SwapChain->GetBuffer
+        (
+            0
+            , IID_PPV_ARGS(BackBuffer.GetAddressOf())
+        );
 
         if (FAILED(Result))
         {
@@ -278,9 +305,13 @@ namespace Engine
             return false;
         }
 
-        Result = Device->CreateRenderTargetView(BackBuffer.Get(), nullptr,
-                                                RenderTargetView.
-                                                GetAddressOf());
+        Result = Device->CreateRenderTargetView
+        (
+            BackBuffer.Get()
+            , nullptr
+            , RenderTargetView.
+            GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -302,8 +333,8 @@ namespace Engine
         return true;
     }
 
-    bool FD3D11Renderer::CreateDepthStencil(const std::uint32_t Width,
-                                            const std::uint32_t Height)
+    bool FD3D11Renderer::CreateDepthStencil(const std::uint32_t Width
+                                            , const std::uint32_t Height)
     {
         ENGINE_ASSERT(Device != nullptr);
 
@@ -325,8 +356,12 @@ namespace Engine
         TextureDescription.CPUAccessFlags = 0;
         TextureDescription.MiscFlags = 0;
 
-        HRESULT Result = Device->CreateTexture2D(
-            &TextureDescription, nullptr, DepthStencilTexture.GetAddressOf());
+        HRESULT Result = Device->CreateTexture2D
+        (
+            &TextureDescription
+            , nullptr
+            , DepthStencilTexture.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -341,10 +376,13 @@ namespace Engine
         ViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
         ViewDescription.Texture2D.MipSlice = 0;
 
-        Result = Device->CreateDepthStencilView(DepthStencilTexture.Get(),
-                                                &ViewDescription,
-                                                DepthStencilView.
-                                                GetAddressOf());
+        Result = Device->CreateDepthStencilView
+        (
+            DepthStencilTexture.Get()
+            , &ViewDescription
+            , DepthStencilView.
+            GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -364,8 +402,12 @@ namespace Engine
         Description.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         Description.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-        const HRESULT Result = Device->CreateBuffer(
-            &Description, nullptr, TransformBuffer.GetAddressOf());
+        const HRESULT Result = Device->CreateBuffer
+        (
+            &Description
+            , nullptr
+            , TransformBuffer.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -388,8 +430,11 @@ namespace Engine
         Description.MinLOD = 0.0f;
         Description.MaxLOD = D3D11_FLOAT32_MAX;
 
-        const HRESULT Result = Device->CreateSamplerState(
-            &Description, SamplerState.GetAddressOf());
+        const HRESULT Result = Device->CreateSamplerState
+        (
+            &Description
+            , SamplerState.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -414,8 +459,8 @@ namespace Engine
             return false;
         }
 
-        BasicShader = AssetManager->LoadShader("BasicShader",
-                                               L"Shaders/Basic.hlsl");
+        BasicShader = AssetManager->LoadShader
+            ("BasicShader", L"Shaders/Basic.hlsl");
 
         if (BasicShader == nullptr)
         {
@@ -424,8 +469,11 @@ namespace Engine
             return false;
         }
 
-        CheckerTexture = AssetManager->LoadTexture(
-            "CheckerTexture", L"Assets/Textures/Checker.png");
+        CheckerTexture = AssetManager->LoadTexture
+        (
+            "CheckerTexture"
+            , L"Assets/Textures/Checker.png"
+        );
 
         if (CheckerTexture == nullptr)
         {
@@ -438,15 +486,20 @@ namespace Engine
     }
 
     bool FD3D11Renderer::UpdateTransformBuffer(
-        const DirectX::FXMMATRIX WorldMatrix,
-        const DirectX::CXMMATRIX ViewMatrix,
-        const DirectX::CXMMATRIX ProjectionMatrix)
+        const DirectX::FXMMATRIX WorldMatrix
+        , const DirectX::CXMMATRIX ViewMatrix
+        , const DirectX::CXMMATRIX ProjectionMatrix)
     {
         D3D11_MAPPED_SUBRESOURCE MappedResource{};
 
-        const HRESULT Result = DeviceContext->Map(
-            TransformBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
-            &MappedResource);
+        const HRESULT Result = DeviceContext->Map
+        (
+            TransformBuffer.Get()
+            , 0
+            , D3D11_MAP_WRITE_DISCARD
+            , 0
+            , &MappedResource
+        );
 
         if (FAILED(Result))
         {
@@ -458,22 +511,31 @@ namespace Engine
         auto* TransformData = static_cast<FTransformBuffer*>(MappedResource.
             pData);
 
-        DirectX::XMStoreFloat4x4(&TransformData->WorldMatrix,
-                                 DirectX::XMMatrixTranspose(WorldMatrix));
+        DirectX::XMStoreFloat4x4
+        (
+            &TransformData->WorldMatrix
+            , DirectX::XMMatrixTranspose(WorldMatrix)
+        );
 
-        DirectX::XMStoreFloat4x4(&TransformData->ViewMatrix,
-                                 DirectX::XMMatrixTranspose(ViewMatrix));
+        DirectX::XMStoreFloat4x4
+        (
+            &TransformData->ViewMatrix
+            , DirectX::XMMatrixTranspose(ViewMatrix)
+        );
 
-        DirectX::XMStoreFloat4x4(&TransformData->ProjectionMatrix,
-                                 DirectX::XMMatrixTranspose(ProjectionMatrix));
+        DirectX::XMStoreFloat4x4
+        (
+            &TransformData->ProjectionMatrix
+            , DirectX::XMMatrixTranspose(ProjectionMatrix)
+        );
 
         DeviceContext->Unmap(TransformBuffer.Get(), 0);
 
         return true;
     }
 
-    bool FD3D11Renderer::Resize(const std::uint32_t Width,
-                                const std::uint32_t Height)
+    bool FD3D11Renderer::Resize(const std::uint32_t Width
+                                , const std::uint32_t Height)
     {
         ENGINE_ASSERT(DeviceContext != nullptr);
         ENGINE_ASSERT(SwapChain != nullptr);
@@ -497,8 +559,14 @@ namespace Engine
         DepthStencilView.Reset();
         DepthStencilTexture.Reset();
 
-        const HRESULT Result = SwapChain->ResizeBuffers(
-            0, Width, Height, DXGI_FORMAT_UNKNOWN, 0);
+        const HRESULT Result = SwapChain->ResizeBuffers
+        (
+            0
+            , Width
+            , Height
+            , DXGI_FORMAT_UNKNOWN
+            , 0
+        );
 
         if (FAILED(Result))
         {
@@ -534,15 +602,23 @@ namespace Engine
 
         ID3D11RenderTargetView* RenderTargets[]{RenderTargetView.Get()};
 
-        DeviceContext->OMSetRenderTargets(1, RenderTargets,
-                                          DepthStencilView.Get());
+        DeviceContext->OMSetRenderTargets
+            (1, RenderTargets, DepthStencilView.Get());
 
-        DeviceContext->ClearRenderTargetView(
-            RenderTargetView.Get(), ClearColor);
+        DeviceContext->ClearRenderTargetView
+        (
+            RenderTargetView.Get()
+            , ClearColor
+        );
 
-        DeviceContext->ClearDepthStencilView(DepthStencilView.Get(),
-                                             D3D11_CLEAR_DEPTH |
-                                             D3D11_CLEAR_STENCIL, 1.0f, 0);
+        DeviceContext->ClearDepthStencilView
+        (
+            DepthStencilView.Get()
+            , D3D11_CLEAR_DEPTH |
+            D3D11_CLEAR_STENCIL
+            , 1.0f
+            , 0
+        );
     }
 
     bool FD3D11Renderer::RenderScene(const FScene& Scene)
@@ -584,11 +660,15 @@ namespace Engine
 
             FMesh* Mesh = AssetManager->FindMesh(MeshRenderer->GetMeshName());
 
-            FShader* Shader = AssetManager->FindShader(
-                MeshRenderer->GetShaderName());
+            FShader* Shader = AssetManager->FindShader
+            (
+                MeshRenderer->GetShaderName()
+            );
 
-            FTexture* Texture = AssetManager->FindTexture(
-                MeshRenderer->GetTextureName());
+            FTexture* Texture = AssetManager->FindTexture
+            (
+                MeshRenderer->GetTextureName()
+            );
 
             if (Mesh == nullptr || Shader == nullptr || Texture == nullptr)
             {
@@ -600,8 +680,8 @@ namespace Engine
             const DirectX::XMMATRIX WorldMatrix = GameObject.GetTransform().
                 GetWorldMatrix();
 
-            if (!UpdateTransformBuffer(WorldMatrix, ViewMatrix,
-                                       ProjectionMatrix))
+            if (!UpdateTransformBuffer
+                (WorldMatrix, ViewMatrix, ProjectionMatrix))
             {
                 return false;
             }

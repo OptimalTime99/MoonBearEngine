@@ -17,12 +17,14 @@
 
 namespace Sandbox
 {
-    FGoalComponent::FGoalComponent(Engine::FGameObject& Owner,
-                                   Engine::FGameObject& InPlayer,
-                                   FGameState& InGameState,
-                                   const float InTriggerRadius)
-        : FComponent{Owner}, Player{InPlayer}, GameState{InGameState},
-          TriggerRadius{InTriggerRadius}
+    FGoalComponent::FGoalComponent(Engine::FGameObject& Owner
+                                   , Engine::FGameObject& InPlayer
+                                   , FGameState& InGameState
+                                   , const float InTriggerRadius)
+        : FComponent{Owner}
+        , Player{InPlayer}
+        , GameState{InGameState}
+        , TriggerRadius{InTriggerRadius}
     {
     }
 

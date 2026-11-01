@@ -12,8 +12,9 @@
 
 namespace Engine::Detail
 {
-    [[noreturn]] void HandleAssertionFailure(const char* Expression,
-                                             const char* File, int Line);
+    [[noreturn]] void HandleAssertionFailure(const char* Expression
+                                             , const char* File
+                                             , int Line);
 }
 
 #if defined(_DEBUG)

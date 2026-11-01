@@ -28,8 +28,9 @@ namespace Engine
         FMesh(const FMesh&) = delete;
         FMesh& operator=(const FMesh&) = delete;
 
-        bool Initialize(ID3D11Device& Device, std::span<const FVertex> Vertices,
-                        std::span<const std::uint16_t> Indices);
+        bool Initialize(ID3D11Device& Device
+                        , std::span<const FVertex> Vertices
+                        , std::span<const std::uint16_t> Indices);
 
         void Draw(ID3D11DeviceContext& DeviceContext) const;
 

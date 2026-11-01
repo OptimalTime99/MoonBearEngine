@@ -23,9 +23,11 @@ namespace Engine
 
         virtual bool OnInitialize(FScene& Scene) = 0;
 
-        virtual bool OnBeginPlay(FScene& Scene, const IInput& Input) = 0;
+        virtual bool OnBeginPlay(FScene& Scene
+                                 , const IInput& Input) = 0;
 
-        virtual void OnUpdate(float DeltaTime, FScene& Scene) = 0;
+        virtual void OnUpdate(float DeltaTime
+                              , FScene& Scene) = 0;
 
         virtual void OnEndPlay(FScene& Scene) = 0;
 

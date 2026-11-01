@@ -31,12 +31,15 @@
 #include <string>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
-    HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+    HWND WindowHandle
+    , UINT Message
+    , WPARAM WParam
+    , LPARAM LParam);
 
 namespace
 {
-    void DrawGameplayHud(const Engine::EEngineMode Mode,
-                         const std::string_view PlayStatusText)
+    void DrawGameplayHud(const Engine::EEngineMode Mode
+                         , const std::string_view PlayStatusText)
     {
         if (Mode != Engine::EEngineMode::Play)
         {
@@ -53,8 +56,12 @@ namespace
         /*
          * 일반 플레이 HUD를 화면 중앙 상단에 표시한다.
          */
-        ImGui::SetNextWindowPos(ImVec2{InputOutput.DisplaySize.x * 0.5f, 48.0f},
-                                ImGuiCond_Always, ImVec2{0.5f, 0.0f});
+        ImGui::SetNextWindowPos
+        (
+            ImVec2{InputOutput.DisplaySize.x * 0.5f, 48.0f}
+            , ImGuiCond_Always
+            , ImVec2{0.5f, 0.0f}
+        );
 
         ImGui::SetNextWindowBgAlpha(0.75f);
 
@@ -66,9 +73,12 @@ namespace
         {
             if (!PlayStatusText.empty())
             {
-                ImGui::TextUnformatted(PlayStatusText.data(),
-                                       PlayStatusText.data() + PlayStatusText.
-                                       size());
+                ImGui::TextUnformatted
+                (
+                    PlayStatusText.data()
+                    , PlayStatusText.data() + PlayStatusText.
+                    size()
+                );
             }
 
             ImGui::Separator();
@@ -93,10 +103,15 @@ namespace
 
         const float Pulse = 0.5f + 0.5f * std::sin(Time * 4.0f);
 
-        ImGui::SetNextWindowPos(ImVec2{
-                                    InputOutput.DisplaySize.x * 0.5f,
-                                    InputOutput.DisplaySize.y * 0.5f
-                                }, ImGuiCond_Always, ImVec2{0.5f, 0.5f});
+        ImGui::SetNextWindowPos
+        (
+            ImVec2{
+                InputOutput.DisplaySize.x * 0.5f
+                , InputOutput.DisplaySize.y * 0.5f
+            }
+            , ImGuiCond_Always
+            , ImVec2{0.5f, 0.5f}
+        );
 
         ImGui::SetNextWindowBgAlpha(0.65f + Pulse * 0.15f);
 
@@ -136,7 +151,8 @@ namespace Engine
         Shutdown();
     }
 
-    bool FEditor::Initialize(FWindowsWindow& InWindow, FD3D11Renderer& Renderer)
+    bool FEditor::Initialize(FWindowsWindow& InWindow
+                             , FD3D11Renderer& Renderer)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -156,8 +172,8 @@ namespace Engine
             return false;
         }
 
-        if (!ImGui_ImplDX11_Init(&Renderer.GetDevice(),
-                                 &Renderer.GetDeviceContext()))
+        if (!ImGui_ImplDX11_Init
+            (&Renderer.GetDevice(), &Renderer.GetDeviceContext()))
         {
             FLog::Error("Failed to initialize the ImGui DX11 backend.");
 
@@ -212,8 +228,9 @@ namespace Engine
         ImGui::NewFrame();
     }
 
-    EEditorCommand FEditor::Draw(FScene& Scene, const EEngineMode Mode,
-                                 const std::string_view PlayStatusText)
+    EEditorCommand FEditor::Draw(FScene& Scene
+                                 , const EEngineMode Mode
+                                 , const std::string_view PlayStatusText)
     {
         if (!bInitialized)
         {
@@ -252,25 +269,34 @@ namespace Engine
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     }
 
-    bool FEditor::ProcessWindowMessage(const HWND WindowHandle,
-                                       const UINT Message, const WPARAM WParam,
-                                       const LPARAM LParam, LRESULT& OutResult)
+    bool FEditor::ProcessWindowMessage(const HWND WindowHandle
+                                       , const UINT Message
+                                       , const WPARAM WParam
+                                       , const LPARAM LParam
+                                       , LRESULT& OutResult)
     {
         if (!bInitialized)
         {
             return false;
         }
 
-        OutResult = ImGui_ImplWin32_WndProcHandler(
-            WindowHandle, Message, WParam, LParam);
+        OutResult = ImGui_ImplWin32_WndProcHandler
+        (
+            WindowHandle
+            , Message
+            , WParam
+            , LParam
+        );
 
         return OutResult != 0;
     }
 
-    EEditorCommand FEditor::DrawMainMenu(FScene& Scene, const EEngineMode Mode,
-                                         const std::string_view PlayStatusText)
+    EEditorCommand FEditor::DrawMainMenu(FScene& Scene
+                                         , const EEngineMode Mode
+                                         , const std::string_view
+                                         PlayStatusText)
     {
-        EEditorCommand Command = EEditorCommand::None;
+        auto Command = EEditorCommand::None;
 
         if (!ImGui::BeginMainMenuBar())
         {
@@ -325,9 +351,12 @@ namespace Engine
 
         if (!PlayStatusText.empty())
         {
-            ImGui::TextUnformatted(PlayStatusText.data(),
-                                   PlayStatusText.data() + PlayStatusText.
-                                   size());
+            ImGui::TextUnformatted
+            (
+                PlayStatusText.data()
+                , PlayStatusText.data() + PlayStatusText.
+                size()
+            );
         }
 
         if (!StatusMessage.empty())
@@ -342,10 +371,11 @@ namespace Engine
         return Command;
     }
 
-    void FEditor::DrawHierarchy(FScene& Scene, const EEngineMode Mode)
+    void FEditor::DrawHierarchy(FScene& Scene
+                                , const EEngineMode Mode)
     {
-        ImGui::SetNextWindowSize(ImVec2{280.0f, 500.0f},
-                                 ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize
+            (ImVec2{280.0f, 500.0f}, ImGuiCond_FirstUseEver);
 
         ImGui::Begin("Hierarchy");
 
@@ -355,8 +385,10 @@ namespace Engine
 
         if (ImGui::Button("Create Empty"))
         {
-            SelectedObject = &Scene.CreateGameObject(
-                "GameObject " + std::to_string(++NewObjectIndex));
+            SelectedObject = &Scene.CreateGameObject
+            (
+                "GameObject " + std::to_string(++NewObjectIndex)
+            );
         }
 
         ImGui::SameLine();
@@ -389,10 +421,11 @@ namespace Engine
         ImGui::End();
     }
 
-    void FEditor::DrawInspector(FScene& Scene, const EEngineMode Mode)
+    void FEditor::DrawInspector(FScene& Scene
+                                , const EEngineMode Mode)
     {
-        ImGui::SetNextWindowSize(ImVec2{340.0f, 500.0f},
-                                 ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize
+            (ImVec2{340.0f, 500.0f}, ImGuiCond_FirstUseEver);
 
         ImGui::Begin("Inspector");
 
@@ -407,8 +440,13 @@ namespace Engine
 
         std::array<char, 256> NameBuffer{};
 
-        std::snprintf(NameBuffer.data(), NameBuffer.size(), "%s",
-                      SelectedObject->GetName().c_str());
+        std::snprintf
+        (
+            NameBuffer.data()
+            , NameBuffer.size()
+            , "%s"
+            , SelectedObject->GetName().c_str()
+        );
 
         const bool bIsPlaying = Mode == EEngineMode::Play;
 
@@ -483,11 +521,17 @@ namespace Engine
 
     FGameObject& FEditor::CreateCube(FScene& Scene)
     {
-        FGameObject& Cube = Scene.CreateGameObject(
-            "Cube " + std::to_string(++NewObjectIndex));
+        FGameObject& Cube = Scene.CreateGameObject
+        (
+            "Cube " + std::to_string(++NewObjectIndex)
+        );
 
-        Cube.AddComponent<FMeshRendererComponent>(
-            "Cube", "BasicShader", "CheckerTexture");
+        Cube.AddComponent<FMeshRendererComponent>
+        (
+            "Cube"
+            , "BasicShader"
+            , "CheckerTexture"
+        );
 
         return Cube;
     }

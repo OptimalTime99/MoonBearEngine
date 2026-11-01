@@ -22,7 +22,8 @@ namespace Engine
     public:
         void BeginFrame() noexcept;
 
-        void SetKeyState(std::uint32_t KeyCode, bool bIsDown) noexcept;
+        void SetKeyState(std::uint32_t KeyCode
+                         , bool bIsDown) noexcept;
 
         void Reset() noexcept;
 
@@ -33,7 +34,6 @@ namespace Engine
     private:
         [[nodiscard]] static std::uint32_t ToVirtualKey(EKey Key) noexcept;
 
-    private:
         static constexpr std::size_t KeyCount = 256;
 
         std::array<bool, KeyCount> CurrentKeys{};

@@ -18,8 +18,10 @@ namespace Sandbox
     class FRotatingComponent final : public Engine::FComponent
     {
     public:
-        FRotatingComponent(Engine::FGameObject& Owner, float PitchSpeed,
-                           float YawSpeed, float RollSpeed);
+        FRotatingComponent(Engine::FGameObject& Owner
+                           , float PitchSpeed
+                           , float YawSpeed
+                           , float RollSpeed);
 
     protected:
         void OnUpdate(float DeltaTime) override;

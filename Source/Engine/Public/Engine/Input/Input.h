@@ -14,12 +14,7 @@ namespace Engine
 {
     enum class EKey
     {
-        W,
-        A,
-        S,
-        D,
-        R,
-        Escape
+        W, A, S, D, R, Escape
     };
 
     class IInput

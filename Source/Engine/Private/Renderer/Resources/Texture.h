@@ -26,10 +26,11 @@ namespace Engine
         FTexture(const FTexture&) = delete;
         FTexture& operator=(const FTexture&) = delete;
 
-        bool Initialize(ID3D11Device& Device,
-                        const std::filesystem::path& FilePath);
+        bool Initialize(ID3D11Device& Device
+                        , const std::filesystem::path& FilePath);
 
-        void Bind(ID3D11DeviceContext& DeviceContext, std::uint32_t Slot) const;
+        void Bind(ID3D11DeviceContext& DeviceContext
+                  , std::uint32_t Slot) const;
 
         [[nodiscard]] std::uint32_t GetWidth() const noexcept;
 

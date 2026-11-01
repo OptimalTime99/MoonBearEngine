@@ -24,9 +24,10 @@ namespace Sandbox
     class FCollectibleComponent final : public Engine::FComponent
     {
     public:
-        FCollectibleComponent(Engine::FGameObject& Owner,
-                              Engine::FGameObject& Player,
-                              FGameState& GameState, float TriggerRadius);
+        FCollectibleComponent(Engine::FGameObject& Owner
+                              , Engine::FGameObject& Player
+                              , FGameState& GameState
+                              , float TriggerRadius);
 
     protected:
         void OnUpdate(float DeltaTime) override;

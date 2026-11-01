@@ -65,19 +65,25 @@ namespace Sandbox
         return true;
     }
 
-    bool FSandboxApplication::OnBeginPlay(Engine::FScene& Scene,
-                                          const Engine::IInput& Input)
+    bool FSandboxApplication::OnBeginPlay(Engine::FScene& Scene
+                                          , const Engine::IInput& Input)
     {
         Engine::FGameObject* Player = Scene.FindGameObject("Player");
 
-        Engine::FGameObject* Collectible1 = Scene.FindGameObject(
-            "Collectible_1");
+        Engine::FGameObject* Collectible1 = Scene.FindGameObject
+        (
+            "Collectible_1"
+        );
 
-        Engine::FGameObject* Collectible2 = Scene.FindGameObject(
-            "Collectible_2");
+        Engine::FGameObject* Collectible2 = Scene.FindGameObject
+        (
+            "Collectible_2"
+        );
 
-        Engine::FGameObject* Collectible3 = Scene.FindGameObject(
-            "Collectible_3");
+        Engine::FGameObject* Collectible3 = Scene.FindGameObject
+        (
+            "Collectible_3"
+        );
 
         Engine::FGameObject* Goal = Scene.FindGameObject("Goal");
 
@@ -94,8 +100,10 @@ namespace Sandbox
             nullptr || WallEast == nullptr || WallSouth == nullptr || WallNorth
             == nullptr)
         {
-            Engine::FLog::Error(
-                "The gameplay scene is missing a required object.");
+            Engine::FLog::Error
+            (
+                "The gameplay scene is missing a required object."
+            );
 
             return false;
         }
@@ -108,32 +116,49 @@ namespace Sandbox
             WallWest, WallEast, WallSouth, WallNorth
         };
 
-        if (Player->AddComponent<FPlayerControllerComponent>(
-            Input, *GameState, std::move(BlockingObjects), 3.0f) == nullptr)
+        if (Player->AddComponent<FPlayerControllerComponent>
+        (
+            Input
+            , *GameState
+            , std::move(BlockingObjects)
+            , 3.0f
+        ) == nullptr)
         {
             Engine::FLog::Error("Failed to add the player controller.");
 
             return false;
         }
 
-        if (Collectible1->AddComponent<FCollectibleComponent>(
-            *Player, *GameState, 0.6f) == nullptr)
+        if (Collectible1->AddComponent<FCollectibleComponent>
+        (
+            *Player
+            , *GameState
+            , 0.6f
+        ) == nullptr)
         {
             Engine::FLog::Error("Failed to add Collectible_1 gameplay.");
 
             return false;
         }
 
-        if (Collectible2->AddComponent<FCollectibleComponent>(
-            *Player, *GameState, 0.6f) == nullptr)
+        if (Collectible2->AddComponent<FCollectibleComponent>
+        (
+            *Player
+            , *GameState
+            , 0.6f
+        ) == nullptr)
         {
             Engine::FLog::Error("Failed to add Collectible_2 gameplay.");
 
             return false;
         }
 
-        if (Collectible3->AddComponent<FCollectibleComponent>(
-            *Player, *GameState, 0.6f) == nullptr)
+        if (Collectible3->AddComponent<FCollectibleComponent>
+        (
+            *Player
+            , *GameState
+            , 0.6f
+        ) == nullptr)
         {
             Engine::FLog::Error("Failed to add Collectible_3 gameplay.");
 
@@ -153,7 +178,8 @@ namespace Sandbox
         return true;
     }
 
-    void FSandboxApplication::OnUpdate(float, Engine::FScene& Scene)
+    void FSandboxApplication::OnUpdate(float
+                                       , Engine::FScene& Scene)
     {
         if (PlayInput == nullptr || GameState == nullptr)
         {
@@ -211,9 +237,14 @@ namespace Sandbox
     }
 
     Engine::FGameObject& FSandboxApplication::CreateCube(
-        Engine::FScene& Scene, const char* Name, const float PositionX,
-        const float PositionY, const float PositionZ, const float ScaleX,
-        const float ScaleY, const float ScaleZ)
+        Engine::FScene& Scene
+        , const char* Name
+        , const float PositionX
+        , const float PositionY
+        , const float PositionZ
+        , const float ScaleX
+        , const float ScaleY
+        , const float ScaleZ)
     {
         Engine::FGameObject& GameObject = Scene.CreateGameObject(Name);
 
@@ -221,8 +252,12 @@ namespace Sandbox
 
         GameObject.GetTransform().SetScale(ScaleX, ScaleY, ScaleZ);
 
-        GameObject.AddComponent<Engine::FMeshRendererComponent>(
-            "Cube", "BasicShader", "CheckerTexture");
+        GameObject.AddComponent<Engine::FMeshRendererComponent>
+        (
+            "Cube"
+            , "BasicShader"
+            , "CheckerTexture"
+        );
 
         return GameObject;
     }
@@ -236,14 +271,20 @@ namespace Sandbox
 
         Engine::FGameObject* Player = Scene.FindGameObject("Player");
 
-        Engine::FGameObject* Collectible1 = Scene.FindGameObject(
-            "Collectible_1");
+        Engine::FGameObject* Collectible1 = Scene.FindGameObject
+        (
+            "Collectible_1"
+        );
 
-        Engine::FGameObject* Collectible2 = Scene.FindGameObject(
-            "Collectible_2");
+        Engine::FGameObject* Collectible2 = Scene.FindGameObject
+        (
+            "Collectible_2"
+        );
 
-        Engine::FGameObject* Collectible3 = Scene.FindGameObject(
-            "Collectible_3");
+        Engine::FGameObject* Collectible3 = Scene.FindGameObject
+        (
+            "Collectible_3"
+        );
 
         Engine::FGameObject* Goal = Scene.FindGameObject("Goal");
 

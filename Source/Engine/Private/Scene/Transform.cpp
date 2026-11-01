@@ -13,27 +13,30 @@ namespace Engine
 {
     FTransform::FTransform()
     {
-        DirectX::XMStoreFloat4x4(&CachedWorldMatrix,
-                                 DirectX::XMMatrixIdentity());
+        DirectX::XMStoreFloat4x4
+            (&CachedWorldMatrix, DirectX::XMMatrixIdentity());
     }
 
-    void FTransform::SetPosition(const float X, const float Y,
-                                 const float Z) noexcept
+    void FTransform::SetPosition(const float X
+                                 , const float Y
+                                 , const float Z) noexcept
     {
         Position = {X, Y, Z};
         MarkDirty();
     }
 
-    void FTransform::SetRotationDegrees(const float Pitch, const float Yaw,
-                                        const float Roll) noexcept
+    void FTransform::SetRotationDegrees(const float Pitch
+                                        , const float Yaw
+                                        , const float Roll) noexcept
     {
         RotationDegrees = {Pitch, Yaw, Roll};
 
         MarkDirty();
     }
 
-    void FTransform::AddRotationDegrees(const float Pitch, const float Yaw,
-                                        const float Roll) noexcept
+    void FTransform::AddRotationDegrees(const float Pitch
+                                        , const float Yaw
+                                        , const float Roll) noexcept
     {
         RotationDegrees.x += Pitch;
         RotationDegrees.y += Yaw;
@@ -42,8 +45,9 @@ namespace Engine
         MarkDirty();
     }
 
-    void FTransform::SetScale(const float X, const float Y,
-                              const float Z) noexcept
+    void FTransform::SetScale(const float X
+                              , const float Y
+                              , const float Z) noexcept
     {
         Scale = {X, Y, Z};
         MarkDirty();
@@ -68,18 +72,24 @@ namespace Engine
     {
         if (bWorldMatrixDirty)
         {
-            const DirectX::XMMATRIX ScaleMatrix = DirectX::XMMatrixScaling(
-                Scale.x, Scale.y, Scale.z);
+            const DirectX::XMMATRIX ScaleMatrix = DirectX::XMMatrixScaling
+            (
+                Scale.x
+                , Scale.y
+                , Scale.z
+            );
 
             const DirectX::XMMATRIX RotationMatrix =
-                DirectX::XMMatrixRotationRollPitchYaw(
-                    DirectX::XMConvertToRadians(RotationDegrees.x),
-                    DirectX::XMConvertToRadians(RotationDegrees.y),
-                    DirectX::XMConvertToRadians(RotationDegrees.z));
+                DirectX::XMMatrixRotationRollPitchYaw
+                (
+                    DirectX::XMConvertToRadians(RotationDegrees.x)
+                    , DirectX::XMConvertToRadians(RotationDegrees.y)
+                    , DirectX::XMConvertToRadians(RotationDegrees.z)
+                );
 
             const DirectX::XMMATRIX TranslationMatrix =
-                DirectX::XMMatrixTranslation(Position.x, Position.y,
-                                             Position.z);
+                DirectX::XMMatrixTranslation
+                (Position.x, Position.y, Position.z);
 
             /*
              * DirectXMath의 행 벡터 규칙에 따라

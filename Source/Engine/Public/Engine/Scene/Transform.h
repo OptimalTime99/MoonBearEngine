@@ -18,13 +18,21 @@ namespace Engine
     public:
         FTransform();
 
-        void SetPosition(float X, float Y, float Z) noexcept;
+        void SetPosition(float X
+                         , float Y
+                         , float Z) noexcept;
 
-        void SetRotationDegrees(float Pitch, float Yaw, float Roll) noexcept;
+        void SetRotationDegrees(float Pitch
+                                , float Yaw
+                                , float Roll) noexcept;
 
-        void AddRotationDegrees(float Pitch, float Yaw, float Roll) noexcept;
+        void AddRotationDegrees(float Pitch
+                                , float Yaw
+                                , float Roll) noexcept;
 
-        void SetScale(float X, float Y, float Z) noexcept;
+        void SetScale(float X
+                      , float Y
+                      , float Z) noexcept;
 
         [[nodiscard]] const DirectX::XMFLOAT3& GetPosition() const noexcept;
 
@@ -38,7 +46,6 @@ namespace Engine
     private:
         void MarkDirty() noexcept;
 
-    private:
         DirectX::XMFLOAT3 Position{0.0f, 0.0f, 0.0f};
 
         DirectX::XMFLOAT3 RotationDegrees{0.0f, 0.0f, 0.0f};

@@ -38,10 +38,11 @@ namespace Sandbox
 
         bool OnInitialize(Engine::FScene& Scene) override;
 
-        bool OnBeginPlay(Engine::FScene& Scene,
-                         const Engine::IInput& Input) override;
+        bool OnBeginPlay(Engine::FScene& Scene
+                         , const Engine::IInput& Input) override;
 
-        void OnUpdate(float DeltaTime, Engine::FScene& Scene) override;
+        void OnUpdate(float DeltaTime
+                      , Engine::FScene& Scene) override;
 
         void OnEndPlay(Engine::FScene& Scene) override;
 
@@ -50,15 +51,17 @@ namespace Sandbox
         [[nodiscard]] std::string GetPlayStatusText() const override;
 
     private:
-        static Engine::FGameObject& CreateCube(Engine::FScene& Scene,
-                                               const char* Name,
-                                               float PositionX, float PositionY,
-                                               float PositionZ, float ScaleX,
-                                               float ScaleY, float ScaleZ);
+        static Engine::FGameObject& CreateCube(Engine::FScene& Scene
+                                               , const char* Name
+                                               , float PositionX
+                                               , float PositionY
+                                               , float PositionZ
+                                               , float ScaleX
+                                               , float ScaleY
+                                               , float ScaleZ);
 
         void ResetGame(Engine::FScene& Scene);
 
-    private:
         /*
          * Play 세션 동안만 존재한다.
          * Runtime Component는 GameState를 참조하므로 Scene의

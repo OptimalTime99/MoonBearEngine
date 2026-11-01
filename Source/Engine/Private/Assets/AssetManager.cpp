@@ -24,9 +24,9 @@ namespace Engine
 
     FAssetManager::~FAssetManager() = default;
 
-    FMesh* FAssetManager::CreateMesh(const std::string& Name,
-                                     const std::span<const FVertex> Vertices,
-                                     const std::span<const std::uint16_t>
+    FMesh* FAssetManager::CreateMesh(const std::string& Name
+                                     , const std::span<const FVertex> Vertices
+                                     , const std::span<const std::uint16_t>
                                      Indices)
     {
         if (FMesh* ExistingMesh = FindMesh(Name))
@@ -48,8 +48,8 @@ namespace Engine
         return MeshPointer;
     }
 
-    FShader* FAssetManager::LoadShader(const std::string& Name,
-                                       const std::filesystem::path& FilePath)
+    FShader* FAssetManager::LoadShader(const std::string& Name
+                                       , const std::filesystem::path& FilePath)
     {
         if (FShader* ExistingShader = FindShader(Name))
         {
@@ -70,8 +70,9 @@ namespace Engine
         return ShaderPointer;
     }
 
-    FTexture* FAssetManager::LoadTexture(const std::string& Name,
-                                         const std::filesystem::path& FilePath)
+    FTexture* FAssetManager::LoadTexture(const std::string& Name
+                                         , const std::filesystem::path&
+                                         FilePath)
     {
         if (FTexture* ExistingTexture = FindTexture(Name))
         {

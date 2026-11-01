@@ -21,15 +21,12 @@ namespace Engine
 {
     enum class EEngineMode
     {
-        Edit,
-        Play
+        Edit, Play
     };
 
     enum class EEditorCommand
     {
-        None,
-        BeginPlay,
-        EndPlay
+        None, BeginPlay, EndPlay
     };
 
     class FD3D11Renderer;
@@ -41,39 +38,46 @@ namespace Engine
     {
     public:
         FEditor() = default;
-        ~FEditor();
+        ~FEditor() override;
 
         FEditor(const FEditor&) = delete;
         FEditor& operator=(const FEditor&) = delete;
 
-        bool Initialize(FWindowsWindow& Window, FD3D11Renderer& Renderer);
+        bool Initialize(FWindowsWindow& Window
+                        , FD3D11Renderer& Renderer);
 
         void Shutdown();
 
         void BeginFrame();
 
-        [[nodiscard]] EEditorCommand Draw(FScene& Scene, EEngineMode Mode,
-                                          std::string_view PlayStatusText);
+        [[nodiscard]] EEditorCommand Draw(FScene& Scene
+                                          , EEngineMode Mode
+                                          , std::string_view PlayStatusText);
 
         void ClearSelection() noexcept;
 
         void EndFrame();
 
-        bool ProcessWindowMessage(HWND WindowHandle, UINT Message,
-                                  WPARAM WParam, LPARAM LParam,
-                                  LRESULT& OutResult) override;
+        bool ProcessWindowMessage(HWND WindowHandle
+                                  , UINT Message
+                                  , WPARAM WParam
+                                  , LPARAM LParam
+                                  , LRESULT& OutResult) override;
 
     private:
         [[nodiscard]] EEditorCommand DrawMainMenu(
-            FScene& Scene, EEngineMode Mode, std::string_view PlayStatusText);
+            FScene& Scene
+            , EEngineMode Mode
+            , std::string_view PlayStatusText);
 
-        void DrawHierarchy(FScene& Scene, EEngineMode Mode);
+        void DrawHierarchy(FScene& Scene
+                           , EEngineMode Mode);
 
-        void DrawInspector(FScene& Scene, EEngineMode Mode);
+        void DrawInspector(FScene& Scene
+                           , EEngineMode Mode);
 
         FGameObject& CreateCube(FScene& Scene);
 
-    private:
         FWindowsWindow* Window = nullptr;
         FGameObject* SelectedObject = nullptr;
 

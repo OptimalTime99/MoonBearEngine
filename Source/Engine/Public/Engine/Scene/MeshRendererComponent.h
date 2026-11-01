@@ -18,9 +18,10 @@ namespace Engine
     class FMeshRendererComponent final : public FComponent
     {
     public:
-        FMeshRendererComponent(FGameObject& Owner, std::string InMeshName,
-                               std::string InShaderName,
-                               std::string InTextureName);
+        FMeshRendererComponent(FGameObject& Owner
+                               , std::string InMeshName
+                               , std::string InShaderName
+                               , std::string InTextureName);
 
         [[nodiscard]] const std::string& GetMeshName() const noexcept;
 
@@ -31,7 +32,7 @@ namespace Engine
         [[nodiscard]] bool IsVisible() const noexcept;
 
         void SetVisible(bool bInVisible) noexcept;
-        
+
         bool OnInitialize() override;
 
     private:

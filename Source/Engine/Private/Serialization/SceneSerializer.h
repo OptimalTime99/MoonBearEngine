@@ -24,12 +24,13 @@ namespace Engine
 
         [[nodiscard]] static std::string SerializeToString(const FScene& Scene);
 
-        static bool DeserializeFromString(FScene& Scene,
-                                          std::string_view JsonText);
+        static bool DeserializeFromString(FScene& Scene
+                                          , std::string_view JsonText);
 
-        static bool Save(const FScene& Scene,
-                         const std::filesystem::path& FilePath);
+        static bool Save(const FScene& Scene
+                         , const std::filesystem::path& FilePath);
 
-        static bool Load(FScene& Scene, const std::filesystem::path& FilePath);
+        static bool Load(FScene& Scene
+                         , const std::filesystem::path& FilePath);
     };
 }

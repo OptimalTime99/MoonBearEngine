@@ -23,6 +23,7 @@ namespace Engine
         static void Error(std::string_view Message);
 
     private:
-        static void Write(std::string_view Prefix, std::string_view Message);
+        static void Write(std::string_view Prefix
+                          , std::string_view Message);
     };
 }

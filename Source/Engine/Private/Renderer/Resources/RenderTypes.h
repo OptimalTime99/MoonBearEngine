@@ -27,6 +27,9 @@ namespace Engine
         DirectX::XMFLOAT4X4 ProjectionMatrix;
     };
 
-    static_assert(sizeof(FTransformBuffer) % 16 == 0,
-                  "Constant buffer size must be a multiple of 16 bytes.");
+    static_assert
+    (
+        sizeof(FTransformBuffer) % 16 == 0
+        , "Constant buffer size must be a multiple of 16 bytes."
+    );
 }

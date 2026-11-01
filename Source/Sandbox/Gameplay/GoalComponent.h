@@ -24,8 +24,10 @@ namespace Sandbox
     class FGoalComponent final : public Engine::FComponent
     {
     public:
-        FGoalComponent(Engine::FGameObject& Owner, Engine::FGameObject& Player,
-                       FGameState& GameState, float TriggerRadius);
+        FGoalComponent(Engine::FGameObject& Owner
+                       , Engine::FGameObject& Player
+                       , FGameState& GameState
+                       , float TriggerRadius);
 
     protected:
         void OnUpdate(float DeltaTime) override;

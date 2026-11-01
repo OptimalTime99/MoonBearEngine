@@ -13,18 +13,22 @@
 
 namespace Sandbox
 {
-    FRotatingComponent::FRotatingComponent(Engine::FGameObject& Owner,
-                                           const float PitchSpeed,
-                                           const float YawSpeed,
-                                           const float RollSpeed)
-        : FComponent{Owner}, RotationSpeed{PitchSpeed, YawSpeed, RollSpeed}
+    FRotatingComponent::FRotatingComponent(Engine::FGameObject& Owner
+                                           , const float PitchSpeed
+                                           , const float YawSpeed
+                                           , const float RollSpeed)
+        : FComponent{Owner}
+        , RotationSpeed{PitchSpeed, YawSpeed, RollSpeed}
     {
     }
 
     void FRotatingComponent::OnUpdate(const float DeltaTime)
     {
-        GetOwner().GetTransform().AddRotationDegrees(
-            RotationSpeed.x * DeltaTime, RotationSpeed.y * DeltaTime,
-            RotationSpeed.z * DeltaTime);
+        GetOwner().GetTransform().AddRotationDegrees
+        (
+            RotationSpeed.x * DeltaTime
+            , RotationSpeed.y * DeltaTime
+            , RotationSpeed.z * DeltaTime
+        );
     }
 }

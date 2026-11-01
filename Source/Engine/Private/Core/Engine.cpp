@@ -86,7 +86,7 @@ namespace Engine
          * 실행 직후에는 항상 Edit Mode다.
          * Play Mode 상태는 Run() 안에서만 관리한다.
          */
-        EEngineMode EngineMode = EEngineMode::Edit;
+        auto EngineMode = EEngineMode::Edit;
 
         /*
          * 디스크 임시 파일 대신 Play 직전 Scene을
@@ -129,8 +129,11 @@ namespace Engine
                  */
                 Editor.ClearSelection();
 
-                const bool bRestored = FSceneSerializer::DeserializeFromString(
-                    Scene, EditorSceneSnapshot);
+                const bool bRestored = FSceneSerializer::DeserializeFromString
+                (
+                    Scene
+                    , EditorSceneSnapshot
+                );
 
                 Application.OnEndPlay(Scene);
                 EditorSceneSnapshot.clear();
@@ -149,8 +152,11 @@ namespace Engine
                 Scene.EndPlay();
                 Editor.ClearSelection();
 
-                const bool bRestored = FSceneSerializer::DeserializeFromString(
-                    Scene, EditorSceneSnapshot);
+                const bool bRestored = FSceneSerializer::DeserializeFromString
+                (
+                    Scene
+                    , EditorSceneSnapshot
+                );
 
                 Application.OnEndPlay(Scene);
                 EditorSceneSnapshot.clear();
@@ -187,8 +193,11 @@ namespace Engine
              */
             Editor.ClearSelection();
 
-            const bool bRestored = FSceneSerializer::DeserializeFromString(
-                Scene, EditorSceneSnapshot);
+            const bool bRestored = FSceneSerializer::DeserializeFromString
+            (
+                Scene
+                , EditorSceneSnapshot
+            );
 
             /*
              * Runtime Component가 제거된 다음
@@ -263,8 +272,12 @@ namespace Engine
 
             Editor.BeginFrame();
 
-            const EEditorCommand EditorCommand = Editor.Draw(
-                Scene, EngineMode, Application.GetPlayStatusText());
+            const EEditorCommand EditorCommand = Editor.Draw
+            (
+                Scene
+                , EngineMode
+                , Application.GetPlayStatusText()
+            );
 
             if (EditorCommand == EEditorCommand::BeginPlay)
             {

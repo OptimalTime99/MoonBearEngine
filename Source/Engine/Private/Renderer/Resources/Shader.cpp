@@ -41,10 +41,10 @@ namespace
 
 namespace Engine
 {
-    bool FShader::Initialize(ID3D11Device& Device,
-                             const std::filesystem::path& FilePath,
-                             const std::string_view VertexEntryPoint,
-                             const std::string_view PixelEntryPoint)
+    bool FShader::Initialize(ID3D11Device& Device
+                             , const std::filesystem::path& FilePath
+                             , const std::string_view VertexEntryPoint
+                             , const std::string_view PixelEntryPoint)
     {
         UINT CompileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
@@ -62,12 +62,18 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<ID3DBlob> ErrorBlob;
 
-        HRESULT Result = D3DCompileFromFile(FilePath.c_str(), nullptr,
-                                            D3D_COMPILE_STANDARD_FILE_INCLUDE,
-                                            VertexEntry.c_str(), "vs_5_0",
-                                            CompileFlags, 0,
-                                            VertexShaderBlob.GetAddressOf(),
-                                            ErrorBlob.GetAddressOf());
+        HRESULT Result = D3DCompileFromFile
+        (
+            FilePath.c_str()
+            , nullptr
+            , D3D_COMPILE_STANDARD_FILE_INCLUDE
+            , VertexEntry.c_str()
+            , "vs_5_0"
+            , CompileFlags
+            , 0
+            , VertexShaderBlob.GetAddressOf()
+            , ErrorBlob.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -78,10 +84,13 @@ namespace Engine
             return false;
         }
 
-        Result = Device.CreateVertexShader(VertexShaderBlob->GetBufferPointer(),
-                                           VertexShaderBlob->GetBufferSize(),
-                                           nullptr,
-                                           VertexShader.GetAddressOf());
+        Result = Device.CreateVertexShader
+        (
+            VertexShaderBlob->GetBufferPointer()
+            , VertexShaderBlob->GetBufferSize()
+            , nullptr
+            , VertexShader.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -93,29 +102,32 @@ namespace Engine
         constexpr std::array<D3D11_INPUT_ELEMENT_DESC, 3> InputElements{
             {
                 {
-                    "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-                    static_cast<UINT>(offsetof(FVertex, Position)),
-                    D3D11_INPUT_PER_VERTEX_DATA, 0
-                },
-                {
-                    "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
-                    static_cast<UINT>(offsetof(FVertex, Color)),
-                    D3D11_INPUT_PER_VERTEX_DATA, 0
-                },
-                {
-                    "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-                    static_cast<UINT>(offsetof(FVertex, TextureCoordinate)),
-                    D3D11_INPUT_PER_VERTEX_DATA, 0
+                    "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0
+                    , static_cast<UINT>(offsetof(FVertex, Position))
+                    , D3D11_INPUT_PER_VERTEX_DATA, 0
+                }
+                , {
+                    "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0
+                    , static_cast<UINT>(offsetof(FVertex, Color))
+                    , D3D11_INPUT_PER_VERTEX_DATA, 0
+                }
+                , {
+                    "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0
+                    , static_cast<UINT>(offsetof(FVertex, TextureCoordinate))
+                    , D3D11_INPUT_PER_VERTEX_DATA, 0
                 }
             }
         };
 
-        Result = Device.CreateInputLayout(InputElements.data(),
-                                          static_cast<UINT>(InputElements.
-                                              size()),
-                                          VertexShaderBlob->GetBufferPointer(),
-                                          VertexShaderBlob->GetBufferSize(),
-                                          InputLayout.GetAddressOf());
+        Result = Device.CreateInputLayout
+        (
+            InputElements.data()
+            , InputElements.
+            size()
+            , VertexShaderBlob->GetBufferPointer()
+            , VertexShaderBlob->GetBufferSize()
+            , InputLayout.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -128,11 +140,18 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<ID3DBlob> PixelShaderBlob;
 
-        Result = D3DCompileFromFile(FilePath.c_str(), nullptr,
-                                    D3D_COMPILE_STANDARD_FILE_INCLUDE,
-                                    PixelEntry.c_str(), "ps_5_0", CompileFlags,
-                                    0, PixelShaderBlob.GetAddressOf(),
-                                    ErrorBlob.GetAddressOf());
+        Result = D3DCompileFromFile
+        (
+            FilePath.c_str()
+            , nullptr
+            , D3D_COMPILE_STANDARD_FILE_INCLUDE
+            , PixelEntry.c_str()
+            , "ps_5_0"
+            , CompileFlags
+            , 0
+            , PixelShaderBlob.GetAddressOf()
+            , ErrorBlob.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -143,9 +162,13 @@ namespace Engine
             return false;
         }
 
-        Result = Device.CreatePixelShader(PixelShaderBlob->GetBufferPointer(),
-                                          PixelShaderBlob->GetBufferSize(),
-                                          nullptr, PixelShader.GetAddressOf());
+        Result = Device.CreatePixelShader
+        (
+            PixelShaderBlob->GetBufferPointer()
+            , PixelShaderBlob->GetBufferSize()
+            , nullptr
+            , PixelShader.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {

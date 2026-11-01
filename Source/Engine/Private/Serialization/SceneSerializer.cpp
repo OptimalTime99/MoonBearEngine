@@ -43,8 +43,8 @@ namespace
         std::string TextureName;
     };
 
-    bool ReadObjects(const nlohmann::json& Root,
-                     std::vector<FSerializedGameObject>& OutObjects)
+    bool ReadObjects(const nlohmann::json& Root
+                     , std::vector<FSerializedGameObject>& OutObjects)
     {
         if (Root.at("version").get<int>() != 1)
         {
@@ -107,8 +107,8 @@ namespace
         return true;
     }
 
-    bool ApplyObjects(Engine::FScene& Scene,
-                      const std::vector<FSerializedGameObject>& Objects)
+    bool ApplyObjects(Engine::FScene& Scene
+                      , const std::vector<FSerializedGameObject>& Objects)
     {
         Scene.Clear();
 
@@ -118,20 +118,32 @@ namespace
 
             GameObject.SetActive(Data.bActive);
 
-            GameObject.GetTransform().SetPosition(
-                Data.Position[0], Data.Position[1], Data.Position[2]);
+            GameObject.GetTransform().SetPosition
+            (
+                Data.Position[0]
+                , Data.Position[1]
+                , Data.Position[2]
+            );
 
-            GameObject.GetTransform().SetRotationDegrees(
-                Data.Rotation[0], Data.Rotation[1], Data.Rotation[2]);
+            GameObject.GetTransform().SetRotationDegrees
+            (
+                Data.Rotation[0]
+                , Data.Rotation[1]
+                , Data.Rotation[2]
+            );
 
-            GameObject.GetTransform().SetScale(Data.Scale[0], Data.Scale[1],
-                                               Data.Scale[2]);
+            GameObject.GetTransform().SetScale
+                (Data.Scale[0], Data.Scale[1], Data.Scale[2]);
 
             if (Data.bHasMeshRenderer)
             {
                 auto* MeshRenderer = GameObject.AddComponent<
-                    Engine::FMeshRendererComponent>(
-                    Data.MeshName, Data.ShaderName, Data.TextureName);
+                    Engine::FMeshRendererComponent>
+                (
+                    Data.MeshName
+                    , Data.ShaderName
+                    , Data.TextureName
+                );
 
                 if (MeshRenderer == nullptr)
                 {
@@ -170,14 +182,12 @@ namespace Engine
                 const auto& Scale = Transform.GetScale();
 
                 nlohmann::json ObjectJson{
-                    {"name", GameObject.GetName()},
-                    {"active", GameObject.IsActive()},
-                    {
-                        "transform",
-                        {
-                            {"position", {Position.x, Position.y, Position.z}},
-                            {"rotation", {Rotation.x, Rotation.y, Rotation.z}},
-                            {"scale", {Scale.x, Scale.y, Scale.z}}
+                    {"name", GameObject.GetName()}
+                    , {"active", GameObject.IsActive()}, {
+                        "transform", {
+                            {"position", {Position.x, Position.y, Position.z}}
+                            , {"rotation", {Rotation.x, Rotation.y, Rotation.z}}
+                            , {"scale", {Scale.x, Scale.y, Scale.z}}
                         }
                     }
                 };
@@ -186,10 +196,10 @@ namespace Engine
                     FMeshRendererComponent>())
                 {
                     ObjectJson["meshRenderer"] = {
-                        {"mesh", MeshRenderer->GetMeshName()},
-                        {"shader", MeshRenderer->GetShaderName()},
-                        {"texture", MeshRenderer->GetTextureName()},
-                        {"visible", MeshRenderer->IsVisible()}
+                        {"mesh", MeshRenderer->GetMeshName()}
+                        , {"shader", MeshRenderer->GetShaderName()}
+                        , {"texture", MeshRenderer->GetTextureName()}
+                        , {"visible", MeshRenderer->IsVisible()}
                     };
                 }
 
@@ -206,7 +216,8 @@ namespace Engine
     }
 
     bool FSceneSerializer::DeserializeFromString(
-        FScene& Scene, const std::string_view JsonText)
+        FScene& Scene
+        , const std::string_view JsonText)
     {
         try
         {
@@ -216,8 +227,11 @@ namespace Engine
                 return false;
             }
 
-            const nlohmann::json Root = nlohmann::json::parse(
-                JsonText.begin(), JsonText.end());
+            const nlohmann::json Root = nlohmann::json::parse
+            (
+                JsonText.begin()
+                , JsonText.end()
+            );
 
             std::vector<FSerializedGameObject> Objects;
 
@@ -238,8 +252,8 @@ namespace Engine
         }
     }
 
-    bool FSceneSerializer::Save(const FScene& Scene,
-                                const std::filesystem::path& FilePath)
+    bool FSceneSerializer::Save(const FScene& Scene
+                                , const std::filesystem::path& FilePath)
     {
         const std::string JsonText = SerializeToString(Scene);
 
@@ -286,8 +300,8 @@ namespace Engine
         }
     }
 
-    bool FSceneSerializer::Load(FScene& Scene,
-                                const std::filesystem::path& FilePath)
+    bool FSceneSerializer::Load(FScene& Scene
+                                , const std::filesystem::path& FilePath)
     {
         try
         {
@@ -300,8 +314,8 @@ namespace Engine
             }
 
             const std::string JsonText{
-                std::istreambuf_iterator<char>{InputFile},
-                std::istreambuf_iterator<char>{}
+                std::istreambuf_iterator<char>{InputFile}
+                , std::istreambuf_iterator<char>{}
             };
 
             if (!DeserializeFromString(Scene, JsonText))

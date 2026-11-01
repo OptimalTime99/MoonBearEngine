@@ -18,8 +18,10 @@ namespace Engine
     public:
         virtual ~IWindowsMessageHandler() = default;
 
-        virtual bool ProcessWindowMessage(HWND WindowHandle, UINT Message,
-                                          WPARAM WParam, LPARAM LParam,
-                                          LRESULT& OutResult) = 0;
+        virtual bool ProcessWindowMessage(HWND WindowHandle
+                                          , UINT Message
+                                          , WPARAM WParam
+                                          , LPARAM LParam
+                                          , LRESULT& OutResult) = 0;
     };
 }

@@ -22,12 +22,16 @@
 namespace Sandbox
 {
     FPlayerControllerComponent::FPlayerControllerComponent(
-        Engine::FGameObject& Owner, const Engine::IInput& InInput,
-        FGameState& InGameState,
-        std::vector<Engine::FGameObject*> InBlockingObjects,
-        const float InMoveSpeed)
-        : FComponent{Owner}, Input{InInput}, GameState{InGameState},
-          BlockingObjects{std::move(InBlockingObjects)}, MoveSpeed{InMoveSpeed}
+        Engine::FGameObject& Owner
+        , const Engine::IInput& InInput
+        , FGameState& InGameState
+        , std::vector<Engine::FGameObject*> InBlockingObjects
+        , const float InMoveSpeed)
+        : FComponent{Owner}
+        , Input{InInput}
+        , GameState{InGameState}
+        , BlockingObjects{std::move(InBlockingObjects)}
+        , MoveSpeed{InMoveSpeed}
     {
     }
 
@@ -112,8 +116,8 @@ namespace Sandbox
         Transform.SetPosition(Position.x, Position.y, Position.z);
     }
 
-    bool FPlayerControllerComponent::IsBlocked(const float PositionX,
-                                               const float PositionZ) const
+    bool FPlayerControllerComponent::IsBlocked(const float PositionX
+                                               , const float PositionZ) const
         noexcept
     {
         const auto& PlayerScale = GetOwner().GetTransform().GetScale();

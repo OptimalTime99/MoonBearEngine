@@ -37,15 +37,15 @@ namespace Engine
 
         FAssetManager& operator=(const FAssetManager&) = delete;
 
-        FMesh* CreateMesh(const std::string& Name,
-                          std::span<const FVertex> Vertices,
-                          std::span<const std::uint16_t> Indices);
+        FMesh* CreateMesh(const std::string& Name
+                          , std::span<const FVertex> Vertices
+                          , std::span<const std::uint16_t> Indices);
 
-        FShader* LoadShader(const std::string& Name,
-                            const std::filesystem::path& FilePath);
+        FShader* LoadShader(const std::string& Name
+                            , const std::filesystem::path& FilePath);
 
-        FTexture* LoadTexture(const std::string& Name,
-                              const std::filesystem::path& FilePath);
+        FTexture* LoadTexture(const std::string& Name
+                              , const std::filesystem::path& FilePath);
 
         [[nodiscard]] FMesh* FindMesh(const std::string& Name) const;
 

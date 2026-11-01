@@ -39,9 +39,9 @@ namespace Engine
         FWindowsWindow(FWindowsWindow&&) = delete;
         FWindowsWindow& operator=(FWindowsWindow&&) = delete;
 
-        [[nodiscard]] bool Initialize(const wchar_t* Title,
-                                      std::uint32_t ClientWidth,
-                                      std::uint32_t ClientHeight);
+        [[nodiscard]] bool Initialize(const wchar_t* Title
+                                      , std::uint32_t ClientWidth
+                                      , std::uint32_t ClientHeight);
 
         void ProcessMessages();
         void RequestClose();
@@ -54,21 +54,25 @@ namespace Engine
 
         [[nodiscard]] std::uint32_t GetClientHeight() const noexcept;
 
-        [[nodiscard]] bool ConsumeResizeRequest(std::uint32_t& OutWidth,
-                                                std::uint32_t& OutHeight)
+        [[nodiscard]] bool ConsumeResizeRequest(std::uint32_t& OutWidth
+                                                , std::uint32_t& OutHeight)
             noexcept;
 
         void SetMessageHandler(
             IWindowsMessageHandler* InMessageHandler) noexcept;
 
     private:
-        static LRESULT CALLBACK WindowProcedure(HWND WindowHandle, UINT Message,
-                                                WPARAM WParam, LPARAM LParam);
+        static LRESULT CALLBACK WindowProcedure(HWND WindowHandle
+                                                , UINT Message
+                                                , WPARAM WParam
+                                                , LPARAM LParam);
 
-        LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam,
-                              LPARAM LParam);
+        LRESULT HandleMessage(HWND WindowHandle
+                              , UINT Message
+                              , WPARAM WParam
+                              , LPARAM LParam);
 
-        static constexpr const wchar_t* WindowClassName =
+        static constexpr auto WindowClassName =
             L"MyEngineWindowClass";
 
         FWindowsInput& Input;

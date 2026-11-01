@@ -42,12 +42,16 @@ namespace Engine
 
         void SetActive(bool bInActive) noexcept;
 
-        template <typename TComponent, typename... TArguments> requires
+        template <typename TComponent, typename... TArguments>
+            requires
             std::derived_from<TComponent, FComponent>
         TComponent* AddComponent(TArguments&&... Arguments)
         {
-            auto NewComponent = std::make_unique<TComponent>(
-                *this, std::forward<TArguments>(Arguments)...);
+            auto NewComponent = std::make_unique<TComponent>
+            (
+                *this
+                , std::forward<TArguments>(Arguments)...
+            );
 
             TComponent* ComponentPointer = NewComponent.get();
 
@@ -82,8 +86,9 @@ namespace Engine
             return ComponentPointer;
         }
 
-        template <typename TComponent> requires std::derived_from<
-            TComponent, FComponent>
+        template <typename TComponent>
+            requires std::derived_from<
+                TComponent, FComponent>
         [[nodiscard]] TComponent* GetComponent() noexcept
         {
             for (const auto& Component : Components)
@@ -97,8 +102,9 @@ namespace Engine
             return nullptr;
         }
 
-        template <typename TComponent> requires std::derived_from<
-            TComponent, FComponent>
+        template <typename TComponent>
+            requires std::derived_from<
+                TComponent, FComponent>
         [[nodiscard]] const TComponent* GetComponent() const noexcept
         {
             for (const auto& Component : Components)
@@ -122,7 +128,6 @@ namespace Engine
         void EndPlay();
         void Shutdown();
 
-    private:
         std::string Name;
         FTransform Transform;
 

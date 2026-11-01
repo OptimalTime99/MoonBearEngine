@@ -27,20 +27,20 @@ namespace Sandbox
     class FPlayerControllerComponent final : public Engine::FComponent
     {
     public:
-        FPlayerControllerComponent(Engine::FGameObject& Owner,
-                                   const Engine::IInput& Input,
-                                   FGameState& GameState,
-                                   std::vector<Engine::FGameObject*>
-                                   BlockingObjects, float MoveSpeed);
+        FPlayerControllerComponent(Engine::FGameObject& Owner
+                                   , const Engine::IInput& Input
+                                   , FGameState& GameState
+                                   , std::vector<Engine::FGameObject*>
+                                   BlockingObjects
+                                   , float MoveSpeed);
 
     protected:
         void OnUpdate(float DeltaTime) override;
 
     private:
-        [[nodiscard]] bool IsBlocked(float PositionX,
-                                     float PositionZ) const noexcept;
+        [[nodiscard]] bool IsBlocked(float PositionX
+                                     , float PositionZ) const noexcept;
 
-    private:
         const Engine::IInput& Input;
         FGameState& GameState;
 

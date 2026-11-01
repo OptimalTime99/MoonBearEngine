@@ -28,28 +28,28 @@ namespace Engine
     {
         if (WindowHandle != nullptr)
         {
-            ::DestroyWindow(WindowHandle);
+            DestroyWindow(WindowHandle);
             WindowHandle = nullptr;
         }
 
         if (WindowClassAtom != 0 && InstanceHandle != nullptr)
         {
-            ::UnregisterClassW(WindowClassName, InstanceHandle);
+            UnregisterClassW(WindowClassName, InstanceHandle);
 
             WindowClassAtom = 0;
         }
     }
 
-    bool FWindowsWindow::Initialize(const wchar_t* Title,
-                                    const std::uint32_t InClientWidth,
-                                    const std::uint32_t InClientHeight)
+    bool FWindowsWindow::Initialize(const wchar_t* Title
+                                    , const std::uint32_t InClientWidth
+                                    , const std::uint32_t InClientHeight)
     {
         ENGINE_ASSERT(Title != nullptr);
         ENGINE_ASSERT(InClientWidth > 0);
         ENGINE_ASSERT(InClientHeight > 0);
         ENGINE_ASSERT(WindowHandle == nullptr);
 
-        InstanceHandle = ::GetModuleHandleW(nullptr);
+        InstanceHandle = GetModuleHandleW(nullptr);
 
         if (InstanceHandle == nullptr)
         {
@@ -62,12 +62,12 @@ namespace Engine
         WindowClass.style = CS_HREDRAW | CS_VREDRAW;
         WindowClass.lpfnWndProc = &FWindowsWindow::WindowProcedure;
         WindowClass.hInstance = InstanceHandle;
-        WindowClass.hCursor = ::LoadCursorW(nullptr, IDC_ARROW);
+        WindowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
         WindowClass.hbrBackground = reinterpret_cast<HBRUSH>(static_cast<
             INT_PTR>(COLOR_WINDOW + 1));
         WindowClass.lpszClassName = WindowClassName;
 
-        WindowClassAtom = ::RegisterClassExW(&WindowClass);
+        WindowClassAtom = RegisterClassExW(&WindowClass);
 
         if (WindowClassAtom == 0)
         {
@@ -78,11 +78,11 @@ namespace Engine
         constexpr DWORD WindowStyle = WS_OVERLAPPEDWINDOW;
 
         RECT WindowRectangle{
-            0, 0, static_cast<LONG>(InClientWidth),
-            static_cast<LONG>(InClientHeight)
+            0, 0, static_cast<LONG>(InClientWidth)
+            , static_cast<LONG>(InClientHeight)
         };
 
-        if (!::AdjustWindowRect(&WindowRectangle, WindowStyle, FALSE))
+        if (!AdjustWindowRect(&WindowRectangle, WindowStyle, FALSE))
         {
             FLog::Error("Failed to calculate the window size.");
             return false;
@@ -92,10 +92,21 @@ namespace Engine
 
         const int WindowHeight = WindowRectangle.bottom - WindowRectangle.top;
 
-        WindowHandle = ::CreateWindowExW(0, WindowClassName, Title, WindowStyle,
-                                         CW_USEDEFAULT, CW_USEDEFAULT,
-                                         WindowWidth, WindowHeight, nullptr,
-                                         nullptr, InstanceHandle, this);
+        WindowHandle = CreateWindowExW
+        (
+            0
+            , WindowClassName
+            , Title
+            , WindowStyle
+            , CW_USEDEFAULT
+            , CW_USEDEFAULT
+            , WindowWidth
+            , WindowHeight
+            , nullptr
+            , nullptr
+            , InstanceHandle
+            , this
+        );
 
         if (WindowHandle == nullptr)
         {
@@ -103,12 +114,12 @@ namespace Engine
             return false;
         }
 
-        ::ShowWindow(WindowHandle, SW_SHOW);
-        ::UpdateWindow(WindowHandle);
+        ShowWindow(WindowHandle, SW_SHOW);
+        UpdateWindow(WindowHandle);
 
         RECT ClientRectangle{};
 
-        if (!::GetClientRect(WindowHandle, &ClientRectangle))
+        if (!GetClientRect(WindowHandle, &ClientRectangle))
         {
             FLog::Error("Failed to get the client area.");
             return false;
@@ -135,7 +146,7 @@ namespace Engine
     {
         MSG Message{};
 
-        while (::PeekMessageW(&Message, nullptr, 0, 0, PM_REMOVE))
+        while (PeekMessageW(&Message, nullptr, 0, 0, PM_REMOVE))
         {
             if (Message.message == WM_QUIT)
             {
@@ -143,8 +154,8 @@ namespace Engine
                 continue;
             }
 
-            ::TranslateMessage(&Message);
-            ::DispatchMessageW(&Message);
+            TranslateMessage(&Message);
+            DispatchMessageW(&Message);
         }
     }
 
@@ -154,7 +165,7 @@ namespace Engine
 
         if (WindowHandle != nullptr)
         {
-            ::DestroyWindow(WindowHandle);
+            DestroyWindow(WindowHandle);
         }
     }
 
@@ -178,8 +189,9 @@ namespace Engine
         return ClientHeight;
     }
 
-    bool FWindowsWindow::ConsumeResizeRequest(std::uint32_t& OutWidth,
-                                              std::uint32_t& OutHeight) noexcept
+    bool FWindowsWindow::ConsumeResizeRequest(std::uint32_t& OutWidth
+                                              , std::uint32_t& OutHeight)
+        noexcept
     {
         if (!bResizeRequested)
         {
@@ -200,8 +212,10 @@ namespace Engine
     }
 
     LRESULT CALLBACK FWindowsWindow::WindowProcedure(
-        const HWND InWindowHandle, const UINT Message, const WPARAM WParam,
-        const LPARAM LParam)
+        const HWND InWindowHandle
+        , const UINT Message
+        , const WPARAM WParam
+        , const LPARAM LParam)
     {
         FWindowsWindow* Window = nullptr;
 
@@ -211,38 +225,51 @@ namespace Engine
 
             Window = static_cast<FWindowsWindow*>(CreateData->lpCreateParams);
 
-            ::SetWindowLongPtrW(InWindowHandle, GWLP_USERDATA,
-                                reinterpret_cast<LONG_PTR>(Window));
+            SetWindowLongPtrW
+            (
+                InWindowHandle
+                , GWLP_USERDATA
+                , reinterpret_cast<LONG_PTR>(Window)
+            );
 
             Window->WindowHandle = InWindowHandle;
         }
         else
         {
-            Window = reinterpret_cast<FWindowsWindow*>(::GetWindowLongPtrW(
-                InWindowHandle, GWLP_USERDATA));
+            Window = reinterpret_cast<FWindowsWindow*>(GetWindowLongPtrW
+                (
+                    InWindowHandle
+                    , GWLP_USERDATA
+                ));
         }
 
 
         if (Window != nullptr)
         {
-            return Window->HandleMessage(InWindowHandle, Message, WParam,
-                                         LParam);
+            return Window->HandleMessage
+                (InWindowHandle, Message, WParam, LParam);
         }
 
-        return ::DefWindowProcW(InWindowHandle, Message, WParam, LParam);
+        return DefWindowProcW(InWindowHandle, Message, WParam, LParam);
     }
 
-    LRESULT FWindowsWindow::HandleMessage(const HWND InWindowHandle,
-                                          const UINT Message,
-                                          const WPARAM WParam,
-                                          const LPARAM LParam)
+    LRESULT FWindowsWindow::HandleMessage(const HWND InWindowHandle
+                                          , const UINT Message
+                                          , const WPARAM WParam
+                                          , const LPARAM LParam)
     {
         if (MessageHandler != nullptr)
         {
             LRESULT HandlerResult = 0;
 
-            if (MessageHandler->ProcessWindowMessage(
-                WindowHandle, Message, WParam, LParam, HandlerResult))
+            if (MessageHandler->ProcessWindowMessage
+                (
+                    WindowHandle
+                    , Message
+                    , WParam
+                    , LParam
+                    , HandlerResult
+                ))
             {
                 return HandlerResult;
             }
@@ -256,7 +283,7 @@ namespace Engine
 
         case WM_DESTROY:
             bShouldClose = true;
-            ::PostQuitMessage(0);
+            PostQuitMessage(0);
             return 0;
 
         case WM_NCDESTROY:
@@ -264,11 +291,11 @@ namespace Engine
              * 운영체제가 창을 완전히 제거한 뒤에는 해당 HWND를
              * 다시 DestroyWindow에 전달하지 않도록 상태를 비운다.
              */
-            ::SetWindowLongPtrW(InWindowHandle, GWLP_USERDATA, 0);
+            SetWindowLongPtrW(InWindowHandle, GWLP_USERDATA, 0);
 
             WindowHandle = nullptr;
 
-            return ::DefWindowProcW(InWindowHandle, Message, WParam, LParam);
+            return DefWindowProcW(InWindowHandle, Message, WParam, LParam);
 
         case WM_SIZE:
             {
@@ -277,11 +304,9 @@ namespace Engine
                     return 0;
                 }
 
-                const std::uint32_t NewWidth = static_cast<std::uint32_t>(
-                    LOWORD(LParam));
+                const std::uint32_t NewWidth = LOWORD(LParam);
 
-                const std::uint32_t NewHeight = static_cast<std::uint32_t>(
-                    HIWORD(LParam));
+                const std::uint32_t NewHeight = HIWORD(LParam);
 
                 if (NewWidth == 0 || NewHeight == 0)
                 {
@@ -315,6 +340,6 @@ namespace Engine
             break;
         }
 
-        return ::DefWindowProcW(InWindowHandle, Message, WParam, LParam);
+        return DefWindowProcW(InWindowHandle, Message, WParam, LParam);
     }
 }

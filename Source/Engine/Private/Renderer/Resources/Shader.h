@@ -26,10 +26,10 @@ namespace Engine
         FShader(const FShader&) = delete;
         FShader& operator=(const FShader&) = delete;
 
-        bool Initialize(ID3D11Device& Device,
-                        const std::filesystem::path& FilePath,
-                        std::string_view VertexEntryPoint,
-                        std::string_view PixelEntryPoint);
+        bool Initialize(ID3D11Device& Device
+                        , const std::filesystem::path& FilePath
+                        , std::string_view VertexEntryPoint
+                        , std::string_view PixelEntryPoint);
 
         void Bind(ID3D11DeviceContext& DeviceContext) const;
 

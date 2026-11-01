@@ -16,9 +16,9 @@
 
 namespace Engine
 {
-    bool FMesh::Initialize(ID3D11Device& Device,
-                           const std::span<const FVertex> Vertices,
-                           const std::span<const std::uint16_t> Indices)
+    bool FMesh::Initialize(ID3D11Device& Device
+                           , const std::span<const FVertex> Vertices
+                           , const std::span<const std::uint16_t> Indices)
     {
         if (Vertices.empty() || Indices.empty())
         {
@@ -43,8 +43,8 @@ namespace Engine
         D3D11_SUBRESOURCE_DATA VertexData{};
         VertexData.pSysMem = Vertices.data();
 
-        HRESULT Result = Device.CreateBuffer(&VertexDescription, &VertexData,
-                                             VertexBuffer.GetAddressOf());
+        HRESULT Result = Device.CreateBuffer
+            (&VertexDescription, &VertexData, VertexBuffer.GetAddressOf());
 
         if (FAILED(Result))
         {
@@ -61,8 +61,8 @@ namespace Engine
         D3D11_SUBRESOURCE_DATA IndexData{};
         IndexData.pSysMem = Indices.data();
 
-        Result = Device.CreateBuffer(&IndexDescription, &IndexData,
-                                     IndexBuffer.GetAddressOf());
+        Result = Device.CreateBuffer
+            (&IndexDescription, &IndexData, IndexBuffer.GetAddressOf());
 
         if (FAILED(Result))
         {
@@ -81,18 +81,20 @@ namespace Engine
         ENGINE_ASSERT(VertexBuffer != nullptr);
         ENGINE_ASSERT(IndexBuffer != nullptr);
 
-        const UINT Stride = sizeof(FVertex);
-        const UINT Offset = 0;
+        constexpr UINT Stride = sizeof(FVertex);
+        constexpr UINT Offset = 0;
 
         ID3D11Buffer* VertexBuffers[]{VertexBuffer.Get()};
 
         DeviceContext.IASetVertexBuffers(0, 1, VertexBuffers, &Stride, &Offset);
 
-        DeviceContext.IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R16_UINT,
-                                       0);
+        DeviceContext.IASetIndexBuffer
+            (IndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
-        DeviceContext.IASetPrimitiveTopology(
-            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        DeviceContext.IASetPrimitiveTopology
+        (
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST
+        );
 
         DeviceContext.DrawIndexed(IndexCount, 0, 0);
     }

@@ -34,8 +34,8 @@ namespace Engine
         Write("[Engine][Error] ", Message);
     }
 
-    void FLog::Write(const std::string_view Prefix,
-                     const std::string_view Message)
+    void FLog::Write(const std::string_view Prefix
+                     , const std::string_view Message)
     {
         std::string Output;
         Output.reserve(Prefix.size() + Message.size() + 1);
@@ -48,6 +48,6 @@ namespace Engine
          * OutputDebugStringA는 전달된 문자열을 보관하지 않는다.
          * 따라서 호출이 끝날 때까지 유효한 지역 문자열을 전달할 수 있다.
          */
-        ::OutputDebugStringA(Output.c_str());
+        OutputDebugStringA(Output.c_str());
     }
 }

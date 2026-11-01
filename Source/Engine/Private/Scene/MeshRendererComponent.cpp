@@ -14,11 +14,14 @@
 namespace Engine
 {
     FMeshRendererComponent::FMeshRendererComponent(
-        FGameObject& Owner, std::string InMeshName, std::string InShaderName,
-        std::string InTextureName)
-        : FComponent{Owner}, MeshName{std::move(InMeshName)},
-          ShaderName{std::move(InShaderName)},
-          TextureName{std::move(InTextureName)}
+        FGameObject& Owner
+        , std::string InMeshName
+        , std::string InShaderName
+        , std::string InTextureName)
+        : FComponent{Owner}
+        , MeshName{std::move(InMeshName)}
+        , ShaderName{std::move(InShaderName)}
+        , TextureName{std::move(InTextureName)}
     {
     }
 

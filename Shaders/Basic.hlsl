@@ -63,8 +63,11 @@ float4 PSMain(FVertexOutput Input) : SV_TARGET
      * 래스터라이저가 보간한 정점 색상을
      * 최종 픽셀 색상으로 출력한다.
      */
-    const float4 TextureColor = DiffuseTexture.Sample(
-        LinearSampler, Input.TextureCoordinate);
+    const float4 TextureColor = DiffuseTexture.Sample
+    (
+        LinearSampler
+        , Input.TextureCoordinate
+    );
 
     return TextureColor * Input.Color;
 }

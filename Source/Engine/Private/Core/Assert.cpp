@@ -20,8 +20,9 @@
 
 namespace Engine::Detail
 {
-    [[noreturn]] void HandleAssertionFailure(const char* Expression,
-                                             const char* File, const int Line)
+    [[noreturn]] void HandleAssertionFailure(const char* Expression
+                                             , const char* File
+                                             , const int Line)
     {
         std::string Message = "Assertion failed: ";
         Message.append(Expression);

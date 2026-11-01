@@ -40,7 +40,8 @@ namespace Engine
 
         bool Initialize(const FWindowsWindow& Window);
 
-        bool Resize(std::uint32_t Width, std::uint32_t Height);
+        bool Resize(std::uint32_t Width
+                    , std::uint32_t Height);
 
         void BeginFrame();
 
@@ -55,19 +56,20 @@ namespace Engine
     private:
         bool CreateDeviceAndSwapChain(const FWindowsWindow& Window);
 
-        bool CreateRenderTarget(std::uint32_t Width, std::uint32_t Height);
+        bool CreateRenderTarget(std::uint32_t Width
+                                , std::uint32_t Height);
 
-        bool CreateDepthStencil(std::uint32_t Width, std::uint32_t Height);
+        bool CreateDepthStencil(std::uint32_t Width
+                                , std::uint32_t Height);
 
         bool CreateTransformBuffer();
         bool CreateSamplerState();
         bool LoadAssets();
 
-        bool UpdateTransformBuffer(DirectX::FXMMATRIX WorldMatrix,
-                                   DirectX::CXMMATRIX ViewMatrix,
-                                   DirectX::CXMMATRIX ProjectionMatrix);
+        bool UpdateTransformBuffer(DirectX::FXMMATRIX WorldMatrix
+                                   , DirectX::CXMMATRIX ViewMatrix
+                                   , DirectX::CXMMATRIX ProjectionMatrix);
 
-    private:
         Microsoft::WRL::ComPtr<ID3D11Device> Device;
 
         Microsoft::WRL::ComPtr<ID3D11DeviceContext> DeviceContext;

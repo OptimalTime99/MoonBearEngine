@@ -53,8 +53,8 @@ namespace
 
 namespace Engine
 {
-    bool FTexture::Initialize(ID3D11Device& Device,
-                              const std::filesystem::path& FilePath)
+    bool FTexture::Initialize(ID3D11Device& Device
+                              , const std::filesystem::path& FilePath)
     {
         FScopedComInitializer ComInitializer;
 
@@ -67,9 +67,13 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<IWICImagingFactory> ImagingFactory;
 
-        HRESULT Result = CoCreateInstance(
-            CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
-            IID_PPV_ARGS(ImagingFactory.GetAddressOf()));
+        HRESULT Result = CoCreateInstance
+        (
+            CLSID_WICImagingFactory
+            , nullptr
+            , CLSCTX_INPROC_SERVER
+            , IID_PPV_ARGS(ImagingFactory.GetAddressOf())
+        );
 
         if (FAILED(Result))
         {
@@ -80,9 +84,14 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<IWICBitmapDecoder> Decoder;
 
-        Result = ImagingFactory->CreateDecoderFromFilename(
-            FilePath.c_str(), nullptr, GENERIC_READ,
-            WICDecodeMetadataCacheOnLoad, Decoder.GetAddressOf());
+        Result = ImagingFactory->CreateDecoderFromFilename
+        (
+            FilePath.c_str()
+            , nullptr
+            , GENERIC_READ
+            , WICDecodeMetadataCacheOnLoad
+            , Decoder.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -104,8 +113,10 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<IWICFormatConverter> Converter;
 
-        Result = ImagingFactory->CreateFormatConverter(
-            Converter.GetAddressOf());
+        Result = ImagingFactory->CreateFormatConverter
+        (
+            Converter.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -114,10 +125,15 @@ namespace Engine
             return false;
         }
 
-        Result = Converter->Initialize(Frame.Get(),
-                                       GUID_WICPixelFormat32bppRGBA,
-                                       WICBitmapDitherTypeNone, nullptr, 0.0,
-                                       WICBitmapPaletteTypeCustom);
+        Result = Converter->Initialize
+        (
+            Frame.Get()
+            , GUID_WICPixelFormat32bppRGBA
+            , WICBitmapDitherTypeNone
+            , nullptr
+            , 0.0
+            , WICBitmapPaletteTypeCustom
+        );
 
         if (FAILED(Result))
         {
@@ -157,8 +173,8 @@ namespace Engine
 
         std::vector<std::uint8_t> PixelData(ImageSize);
 
-        Result = Converter->CopyPixels(nullptr, RowPitch, ImageSize,
-                                       PixelData.data());
+        Result = Converter->CopyPixels
+            (nullptr, RowPitch, ImageSize, PixelData.data());
 
         if (FAILED(Result))
         {
@@ -183,8 +199,8 @@ namespace Engine
 
         Microsoft::WRL::ComPtr<ID3D11Texture2D> Texture;
 
-        Result = Device.CreateTexture2D(&TextureDescription, &TextureData,
-                                        Texture.GetAddressOf());
+        Result = Device.CreateTexture2D
+            (&TextureDescription, &TextureData, Texture.GetAddressOf());
 
         if (FAILED(Result))
         {
@@ -193,8 +209,12 @@ namespace Engine
             return false;
         }
 
-        Result = Device.CreateShaderResourceView(
-            Texture.Get(), nullptr, ShaderResourceView.GetAddressOf());
+        Result = Device.CreateShaderResourceView
+        (
+            Texture.Get()
+            , nullptr
+            , ShaderResourceView.GetAddressOf()
+        );
 
         if (FAILED(Result))
         {
@@ -209,8 +229,8 @@ namespace Engine
         return true;
     }
 
-    void FTexture::Bind(ID3D11DeviceContext& DeviceContext,
-                        const std::uint32_t Slot) const
+    void FTexture::Bind(ID3D11DeviceContext& DeviceContext
+                        , const std::uint32_t Slot) const
     {
         ENGINE_ASSERT(ShaderResourceView != nullptr);
 
